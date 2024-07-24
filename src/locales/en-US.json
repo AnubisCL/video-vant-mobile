@@ -1,0 +1,44 @@
+{
+  "home": {
+    "mockGuide": "💿 Mock Guide",
+    "404Demo": "🙅 Page 404 Demo",
+    "echartsDemo": "📊 Echarts Demo",
+    "persistPiniaState": "🍍 Persistent Pinia state",
+    "unocssExample": "🎨 Unocss example",
+    "keepAlive": "🧡 KeepAlive Demo"
+  },
+  "mock": {
+    "fromAsyncData": "Data from asynchronous requests",
+    "noData": "No data",
+    "pull": "Pull",
+    "reset": "Reset"
+  },
+  "charts": {
+    "January": "Jan",
+    "February": "Feb",
+    "March": "Mar",
+    "April": "Apr",
+    "May": "May",
+    "June": "Jun"
+  },
+  "layouts": {
+    "home": "HOME",
+    "profile": "PROFILE",
+    "video": "VIDEO"
+  },
+  "profile": {
+    "darkMode": "🌗 Dark Mode",
+    "language": "📚 Language",
+    "editUserInfo": "Modify User Information",
+    "edit": "Edit",
+    "normal": "Normal",
+    "vip": "VIP",
+    "admin": "Admin",
+    "history": "Viewing History",
+    "collector": "Stars Video",
+    "signOut": "Sign Out"
+  },
+  "keepAlive": {
+    "label": "The current component will be cached"
+  }
+}
