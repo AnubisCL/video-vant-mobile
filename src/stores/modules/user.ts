@@ -23,25 +23,12 @@ const useUserStore = defineStore('user', {
     }
   },
   actions: {
-    async doLogin(user: any) {
+    async signIn(user: any, signType: string = enums.LOGIN_STATUS.SIGN_IN) {
       const loginInfo = {
         username: user.username,
         email: user.email,
         passwordHash: user.password,
-        signType: enums.LOGIN_STATUS.LOGIN_IN
-      }
-      let res= await doLogin(loginInfo)
-      if (res.success) {
-        let userInfo = await getUserInfo()
-        let menuList = await getMenuList()
-      }
-    },
-    async signIn(user: any) {
-      const loginInfo = {
-        username: user.username,
-        email: user.email,
-        passwordHash: user.password,
-        signType: enums.LOGIN_STATUS.SIGN_IN
+        signType: signType
       }
       let res = await signIn({}, loginInfo)
       if (res.success) {
@@ -61,6 +48,7 @@ const useUserStore = defineStore('user', {
         // 3.menu
         let resMenu = await getMenuList()
         if (resMenu.success) {
+          //todo：菜单Router控制
           console.log("menu=>"+resMenu.data)
         }
       } else {
