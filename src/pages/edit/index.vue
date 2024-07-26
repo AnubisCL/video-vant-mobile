@@ -1,14 +1,36 @@
 <script setup lang="ts">
+import {storeToRefs} from "pinia";
+import useUserStore from "@/stores/modules/user";
+
 definePage({
   name: 'edit',
   meta: {
     level: 2,
     title: '个人信息修改',
     i18n: 'profile.editUserInfo',
-  },
+  }
 })
 
-const { t } = useI18n() //todo：国际化
+const userStore = useUserStore();
+const { t } = useI18n()
+
+const data = reactive({
+  editForm: {
+    username: '',
+    email: '',
+    password: '',
+  }
+})
+
+onMounted( () => {
+  data.editForm.username = userStore.user.username
+  data.editForm.email = userStore.user.email
+})
+
+
+async function onSubmit() {
+//   todo：修改个人信息
+}
 </script>
 
 <template>
@@ -16,31 +38,31 @@ const { t } = useI18n() //todo：国际化
     <van-form @submit="onSubmit">
       <van-cell-group inset>
         <van-field
-          v-model="username"
-          name="用户名"
-          label="用户名"
-          placeholder="用户名"
-          :rules="[{ required: true, message: '请填写用户名' }]"
+          v-model="data.editForm.username"
+          :name="t('edit.username')"
+          :label="t('edit.username')"
+          :placeholder="t('edit.username')"
+          :rules="[{ required: true, message: t('edit.usernameMsg') }]"
         />
         <van-field
-          v-model="email"
-          name="邮箱"
-          label="邮箱"
-          placeholder="邮箱"
-          :rules="[{ required: true, message: '请填写用邮箱' }]"
+          v-model="data.editForm.email"
+          :name="t('edit.email')"
+          :label="t('edit.email')"
+          :placeholder="t('edit.email')"
+          :rules="[{ required: true, message: t('edit.emailMsg') }]"
         />
         <van-field
-          v-model="password"
+          v-model="data.editForm.password"
           type="password"
-          name="密码"
-          label="密码"
-          placeholder="密码"
-          :rules="[{ required: true, message: '请填写密码' }]"
+          :name="t('edit.password')"
+          :label="t('edit.password')"
+          :placeholder="t('edit.password')"
+          :rules="[{ required: true, message: t('edit.passwordMsg') }]"
         />
       </van-cell-group>
       <div style="margin: 16px;">
         <van-button round block type="primary" native-type="submit">
-          修改
+          {{ t('button.edit') }}
         </van-button>
       </div>
     </van-form>

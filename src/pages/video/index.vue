@@ -76,7 +76,7 @@ function setup() {
               :height="100"
               fit="contain"
               lazy-load
-              src="https://fastly.jsdelivr.net/npm/@vant/assets/cat.jpeg">
+              src="">
               <template v-slot:loading>
                 <van-loading size="24" vertical>加载中...</van-loading>
               </template>

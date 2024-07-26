@@ -38,6 +38,25 @@
     "collector": "Stars Video",
     "signOut": "Sign Out"
   },
+  "edit": {
+    "username": "Username",
+    "usernameMsg": "Please fill in your username",
+    "email": "email",
+    "emailMsg": "Please fill in your email address",
+    "password": "Password",
+    "passwordMsg": "Please fill in your password",
+    "emailAndPassword": "Username/Email",
+    "emailAndPasswordMsg": "Please fill in your username or password",
+    "account": "account"
+  },
+  "button": {
+    "edit": "Modify",
+    "SignOut": "Sign Out",
+    "signUp": "Sign Up",
+    "signIn": "Sign In"
+  },
+  "video": {
+  },
   "keepAlive": {
     "label": "The current component will be cached"
   }

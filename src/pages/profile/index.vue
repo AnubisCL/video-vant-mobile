@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { languageColumns, locale } from '@/utils/i18n'
 import useAppStore from "@/stores/modules/app";
+import useUserStore from "@/stores/modules/user";
 
 definePage({
   name: 'profile',
@@ -10,7 +11,27 @@ definePage({
 })
 
 const appStore = useAppStore()
+const userStore = useUserStore()
 const checked = ref<boolean>(isDark.value)
+const { t } = useI18n()
+const router = useRouter()
+const showLanguagePicker = ref(false)
+const languageValues = ref<Array<string>>([locale.value])
+const language = computed(() => languageColumns.find(l => l.value === locale.value).text)
+
+const data = reactive({
+  user: {
+    username: '',
+    email: '',
+    roleId: 0
+  }
+})
+
+onMounted( () => {
+  data.user.username = userStore.user.username
+  data.user.email = userStore.user.email
+  data.user.roleId = userStore.user.roleId
+})
 
 watch(
   () => isDark.value,
@@ -25,22 +46,21 @@ function toggle() {
   appStore.switchMode(isDark.value ? 'dark' : 'light')
 }
 
-const { t } = useI18n()
-
-const showLanguagePicker = ref(false)
-const languageValues = ref<Array<string>>([locale.value])
-const language = computed(() => languageColumns.find(l => l.value === locale.value).text)
-
 function onLanguageConfirm(event: { selectedOptions: PickerColumn }) {
   locale.value = event.selectedOptions[0].value as string
   showLanguagePicker.value = false
+}
+
+async function signOut() {
+  await userStore.signOut()
+  await router.replace('/login')
 }
 </script>
 
 <template>
   <Container :padding-x="0" :padding-t="16" :padding-b="100">
     <van-cell-group inset>
-        <van-cell is-link :value="t('profile.edit')" to="edit">
+        <van-cell :value="t('profile.edit')">
           <!-- 使用 title 插槽来自定义标题 -->
           <template #title>
             <!-- 设置垂直 -->
@@ -52,24 +72,23 @@ function onLanguageConfirm(event: { selectedOptions: PickerColumn }) {
                 fit="cover"
                 width="100"
                 height="100"
-                src="https://fastly.jsdelivr.net/npm/@vant/assets/cat.jpeg"
+                src=""
               />
-              <span class="custom-title">userName</span>
+              <span class="custom-title">{{ data.user.username }}</span>
             </van-space>
           </template>
           <template #label>
-            <span >This is description.</span>
+            <span >{{ data.user.email }}</span>
           </template>
           <template #value>
             <van-space direction="vertical" fill>
-              <!-- todo:用户Id展示，角色展示 -->
-              <van-tag style="margin-top: 40px; right: 80px;" size="large" type="primary">{{ t('profile.normal') }}</van-tag>
-  <!--            <van-tag type="warning">{{ t('profile.vip') }}</van-tag>-->
-  <!--            <van-tag type="danger">{{ t('profile.admin') }}</van-tag>-->
+              <van-tag v-if="data.user.roleId == 1" style="margin-top: 40px; right: 80px;" size="large" type="danger">{{ t('profile.admin') }}</van-tag>
+              <van-tag v-if="data.user.roleId == 2 || data.user.roleId == 4" style="margin-top: 40px; right: 80px;" size="large" type="primary">{{ t('profile.normal') }}</van-tag>
+              <van-tag v-if="data.user.roleId == 3" style="margin-top: 40px; right: 80px;" size="large" type="warning">{{ t('profile.vip') }}</van-tag>
             </van-space>
           </template>
           <template #right-icon>
-            <van-icon name="setting-o" class="search-icon"/>
+            <van-icon @click="router.push('/edit')" name="setting-o" class="search-icon"/>
           </template>
         </van-cell>
         <van-cell center :title="t('profile.darkMode')">
@@ -92,11 +111,10 @@ function onLanguageConfirm(event: { selectedOptions: PickerColumn }) {
         <!-- todo:历史观看记录 -->
         <van-cell is-link :title="t('profile.history')">
           <template #right-icon>
-            <van-icon name="todo-list-o" class="search-icon"/>
+            <van-icon name="browsing-history-o" class="search-icon"/>
           </template>
         </van-cell>
-        <!-- todo:登出 -->
-        <van-cell is-link :title="t('profile.signOut')">
+        <van-cell is-link :title="t('profile.signOut')" @click="signOut">
           <template #right-icon>
             <van-icon name="down" class="search-icon"/>
           </template>

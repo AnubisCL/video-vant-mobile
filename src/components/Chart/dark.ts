@@ -47,7 +47,7 @@ const theme: any = {
       color: '#817f91',
     },
     label: {
-      // TODO Contrast of label backgorundColor
+      // 标签 backgorundColor 的对比度
       color: '#fff',
     },
   },

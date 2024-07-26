@@ -20,9 +20,11 @@ export default ({ mode }: ConfigEnv): UserConfig => {
       port: 3000,
       proxy: {
         '/api': {
-          target: '127.0.0.1:7077',
+          target: 'http://192.168.2.72:7077/',
           ws: false,
+          debug: true,
           changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/api/, ''),
         },
       },
     },
