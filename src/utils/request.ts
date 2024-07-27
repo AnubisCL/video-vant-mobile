@@ -25,7 +25,6 @@ export type RequestError = AxiosError<{
 // 异常拦截处理器
 function errorHandler(error: RequestError): Promise<any> {
   if (error.response) {
-    // todo：error message 国际化
     const { data = {}, status, statusText } = error.response
     // 403 无权限
     if (status === 403) {
@@ -79,10 +78,7 @@ export async function request<T = any>(config: AxiosRequestConfig): Promise<ApiR
    * */
   return axiosInstance.request<T>(config)
     .then(({ code, msg, data }) => {
-      if (code == 0) {
-        return { success: true, data: data, message: msg } as const
-      }
-      return { success: false, data: data, message: msg } as const
+      return { success: code == 0, data: data, message: msg } as const
     })
     .catch((err) => {
       return { success: false, data: err, message: err.message } as const

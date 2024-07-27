@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {ref} from 'vue';
+import VideoPlayer from '@/components/VideoPlayer.vue'
 
 definePage({
   name: 'video',
@@ -41,6 +42,19 @@ const onRefresh = () => {
   onLoad();
 };
 
+let videoOption = reactive({
+  autoplay: false,
+  controls: true,
+  sources: [
+    {
+      src: 'http://192.168.1.6:8080/hls/test.m3u8',
+      type:'application/x-mpegURL'
+    }
+  ],
+  width:'150px',
+  height:'200px'
+})
+
 function setup() {
   return {
     list,
@@ -71,20 +85,12 @@ function setup() {
         <van-grid :border="false" :column-num="2" :gutter="3">
           <van-grid-item v-for="item in list" :key="item" :title="item">
             <!-- todo: 1280x720 video card component -->
-            <van-image
-              :width="160"
-              :height="100"
-              fit="contain"
-              lazy-load
-              src="">
-              <template v-slot:loading>
-                <van-loading size="24" vertical>加载中...</van-loading>
-              </template>
-            </van-image>
-          </van-grid-item>
-        </van-grid>
-      </van-list>
-    </van-pull-refresh>
+            <video-player  :options="videoOption"></video-player>
+              </van-grid-item>
+            </van-grid>
+          </van-list>
+        </van-pull-refresh>
     <van-back-top/>
   </Container>
 </template>
+
