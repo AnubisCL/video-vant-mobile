@@ -50,7 +50,7 @@ function requestHandler(config: InternalAxiosRequestConfig): InternalAxiosReques
   // 让每个请求携带自定义 token, 请根据实际情况修改
   if (savedToken)
     config.headers[STORAGE_TOKEN_KEY] = savedToken
-
+  config.headers['Access-Control-Allow-Origin'] = ' *'
   return config
 }
 
