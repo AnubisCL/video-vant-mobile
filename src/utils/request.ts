@@ -1,7 +1,6 @@
 import type { AxiosError, InternalAxiosRequestConfig, AxiosRequestConfig } from 'axios'
 import axios from 'axios'
 import { showNotify } from 'vant'
-import useUserStore from "@/stores/modules/user";
 import { STORAGE_TOKEN_KEY } from '@/stores/mutation-type'
 import {localStorage} from "@/utils/local-storage";
 // 这里是用于设定请求后端时，所用的 Token KEY

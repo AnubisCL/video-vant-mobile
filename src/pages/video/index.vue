@@ -55,7 +55,7 @@ async function onLoad() {
     }
   }
   loading.value = false;
-};
+}
 
 const onRefresh = () => {
   // 清空列表数据
