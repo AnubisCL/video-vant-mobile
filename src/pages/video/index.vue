@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {ref} from 'vue';
 import VideoPlayer from '@/components/VideoPlayer.vue'
+import {getVideoList} from "@/api/video";
 
 definePage({
   name: 'video',
@@ -11,25 +12,49 @@ definePage({
 
 const {t} = useI18n()
 const list = ref([]);
+const pageReq = ref({
+  current: 1,
+  size: 4,
+  sortBy: "",
+  asc: false
+});
+const pageRes = ref({
+  pages: 0,
+  total: 0
+});
 const loading = ref(false);
 const finished = ref(false);
 const refreshing = ref(false);
 
-const onLoad = () => {
-  setTimeout(() => {
-    if (refreshing.value) {
-      list.value = [];
-      refreshing.value = false;
+async function onLoad() {
+  if (refreshing.value) {
+    list.value = [];
+    pageReq.value = {
+      current: 1,
+      size: 4,
+      sortBy: "",
+      asc: false
     }
-    for (let i = 0; i < 10; i++) {
-      list.value.push(list.value.length + 1);
-    }
-    loading.value = false;
-
-    if (list.value.length >= 40) {
+    refreshing.value = false;
+  }
+  let res = await getVideoList({},{
+    keyword: "",
+    page: pageReq.value
+  })
+  if (res.success) {
+    const records = res.data.records
+    if (records.length > 0) {
+      records.forEach((item: any) => {
+        list.value.push(item);
+      });
+      pageReq.value.current = pageReq.value.current + 1
+      pageRes.value.pages = res.data.pages
+      pageRes.value.total = res.data.total
+    } else {
       finished.value = true;
     }
-  }, 1000);
+  }
+  loading.value = false;
 };
 
 const onRefresh = () => {
@@ -41,19 +66,6 @@ const onRefresh = () => {
   loading.value = true;
   onLoad();
 };
-
-let videoOption = reactive({
-  autoplay: false,
-  controls: true,
-  sources: [
-    {
-      src: 'http://192.168.1.6:8080/hls/test.m3u8',
-      type:'application/x-mpegURL'
-    }
-  ],
-  width:'150px',
-  height:'200px'
-})
 
 function setup() {
   return {
@@ -82,10 +94,30 @@ function setup() {
         finished-text="没有更多了"
         @load="onLoad"
       >
-        <van-grid :border="false" :column-num="2" :gutter="3">
-          <van-grid-item v-for="item in list" :key="item" :title="item">
-            <!-- todo: 1280x720 video card component -->
-            <video-player  :options="videoOption"></video-player>
+        <van-grid :border="false" :column-num="1" :gutter="3">
+          <van-grid-item v-for="item in list" :key="item.videoId" :title="item.title">
+            <video-player :options="{
+                  controls: true, // 是否显示控制条
+                  poster: './../public/favicon-dark.svg', // 视频封面图地址
+                  preload: 'none', //预加载
+                  autoplay: false, //自动播放
+                  fluid: true, // 自适应宽高
+                  language: 'zh-CN', // 设置语言
+                  muted: true, // 是否静音
+                  inactivityTimeout: false,
+                  sources: [
+                    {
+                      // src: 'http://192.168.2.122:8080/hls/test.m3u8',
+                      // type:'application/x-mpegURL'
+                      // src: 'http://192.168.2.122:8080/gif/video/2024/07/31/1.mp4',
+                      src: item.videoUrl,
+                      type: 'video/mp4',
+                      // poster: item.imageUrl, // 视频封面图地址
+                    }
+                  ],
+                  width:'100%',
+                  height:'100%'
+                }"></video-player>
               </van-grid-item>
             </van-grid>
           </van-list>

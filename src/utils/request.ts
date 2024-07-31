@@ -78,6 +78,13 @@ export async function request<T = any>(config: AxiosRequestConfig): Promise<ApiR
    * */
   return axiosInstance.request<T>(config)
     .then(({ code, msg, data }) => {
+      if (code == 1 && msg === '登录已失效') {
+        localStorage.set(STORAGE_TOKEN_KEY, '')
+        showNotify({
+          type: 'danger',
+          message: msg
+        })
+      }
       return { success: code == 0, data: data, message: msg } as const
     })
     .catch((err) => {
