@@ -1,3 +1,6 @@
+## Vite + Vue 3 + Vant + Ts
+### 后端：[video-platform](https://github.com/AnubisCL/video-platform)
+
 ## 预配置
 
 ### UI 框架
