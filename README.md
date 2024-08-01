@@ -30,6 +30,7 @@
 - [@unhead/vue](https://github.com/unjs/unhead) - 响应式地操作文档头信息
 - [vite-plugin-pwa](https://github.com/antfu/vite-plugin-pwa) - PWA
 - [vite-plugin-sitemap](https://github.com/jbaubree/vite-plugin-sitemap) - sitemap 和 robots 生成器
+- [@types/video.js](https://gitcode.gitcode.host/docs-cn/video.js-docs-cn/index.html) - 网络视频播放器
 
 ### 编码风格
 
@@ -49,22 +50,21 @@
   - [i18n Ally](https://marketplace.visualstudio.com/items?itemName=lokalise.i18n-ally) - 多合一的 I18n 支持
   - [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint)
 
-> Node 版本 18+
+> Node v18.19.0 (npm v10.8.2)
 
 ### 开发
 只需要执行以下命令就可以在 <http://localhost:3000> 中看到
 
 ```bash
-pnpm dev
+vite
 ```
 
 ### 构建
 构建该应用只需要执行以下命令
 ```bash
-pnpm build
+vite build
 ```
 然后你会看到用于发布的 `dist` 文件夹被生成。
 
 ## License
-
-[MIT](./LICENSE) License
+[Apache License](./LICENSE) License
