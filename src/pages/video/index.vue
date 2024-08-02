@@ -2,6 +2,7 @@
 import {ref} from 'vue';
 import VideoPlayer from '@/components/VideoPlayer.vue'
 import {getVideoList} from "@/api/video";
+import {showToast} from "vant";
 
 definePage({
   name: 'video',
@@ -25,6 +26,15 @@ const pageRes = ref({
 const loading = ref(false);
 const finished = ref(false);
 const refreshing = ref(false);
+const keyword = ref("");
+
+const onSearch = (val) => {
+  showToast(val)
+  onRefresh()
+};
+const onCancel = () => {
+  showToast('取消')
+};
 
 async function onLoad() {
   if (refreshing.value) {
@@ -38,7 +48,7 @@ async function onLoad() {
     refreshing.value = false;
   }
   let res = await getVideoList({},{
-    keyword: "",
+    keyword: keyword.value,
     page: pageReq.value
   })
   if (res.success) {
@@ -82,7 +92,10 @@ function setup() {
 <template>
   <Container :padding-x="0" :padding-t="0" :padding-b="100">
     <van-search
-      v-model="value"
+      v-model="keyword"
+      @search="onSearch"
+      @cancel="onCancel"
+      :disabled="loading"
       shape="round"
       :background='"#3c9d8b"'
       placeholder="请输入搜索关键词"
@@ -107,10 +120,9 @@ function setup() {
                   inactivityTimeout: false,
                   sources: [
                     {
-                      // src: 'http://192.168.2.122:8080/hls/test.m3u8',
-                      // type:'application/x-mpegURL'
                       src: item.videoUrl,
-                      type: 'video/mp4'
+                      type:'application/x-mpegURL',
+                      // type: 'video/mp4'
                     }
                   ],
                   width:'100%',
