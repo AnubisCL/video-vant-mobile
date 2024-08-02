@@ -99,6 +99,7 @@ function setup() {
             <video-player :options="{
                   controls: true, // 是否显示控制条
                   preload: 'none', //预加载
+                  poster: item.imageUrl, // 视频封面图地址
                   autoplay: false, //自动播放
                   fluid: true, // 自适应宽高
                   language: 'zh-CN', // 设置语言
@@ -109,8 +110,7 @@ function setup() {
                       // src: 'http://192.168.2.122:8080/hls/test.m3u8',
                       // type:'application/x-mpegURL'
                       src: item.videoUrl,
-                      type: 'video/mp4',
-                      poster: item.imageUrl // 视频封面图地址
+                      type: 'video/mp4'
                     }
                   ],
                   width:'100%',
