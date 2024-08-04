@@ -1,9 +1,11 @@
 import { defineStore } from 'pinia'
 import enums from '@/utils/enums'
-import {doLogin, getMenuList, getUserInfo, isLogin, signIn, signOut} from "@/api/auth";
+import {getMenuList, getUserInfo, isLogin, signIn, signOut} from "@/api/auth";
 import {showNotify} from "vant";
 import {localStorage} from "@/utils/local-storage";
 import {STORAGE_TOKEN_KEY} from "@/stores/mutation-type";
+import router from "@/router";
+import {startCheckLoginTimer, stopCheckLoginTimer} from "@/utils/loginChecker";
 
 const useUserStore = defineStore('user', {
   state: () => reactive({
@@ -51,6 +53,8 @@ const useUserStore = defineStore('user', {
           //todo：菜单Router控制
           console.log("menu=>"+resMenu.data)
         }
+        await startCheckLoginTimer()
+        await router.push('/')
       } else {
         showNotify({
           type: 'danger',
@@ -66,12 +70,19 @@ const useUserStore = defineStore('user', {
           type: 'success',
           message: res.message
         })
+        await stopCheckLoginTimer()
       }
     },
     async isLogin() {
       let res = await isLogin()
       if (res.success) {
         return res.data == 'true'
+      } else {
+        showNotify({
+          type: 'danger',
+          message: res.message
+        })
+        return false
       }
     }
   }

@@ -20,6 +20,7 @@ import useRouteTransitionNameStore from '@/stores/modules/routeTransitionName'
 import useRouteCacheStore from '@/stores/modules/routeCache'
 import {localStorage} from "@/utils/local-storage";
 import {STORAGE_TOKEN_KEY} from "@/stores/mutation-type";
+import {stopCheckLoginTimer} from "@/utils/loginChecker";
 
 // 配置NProgress的显示选项，包括显示加载指示器和指定父元素ID。
 NProgress.configure({ showSpinner: true, parent: '#app' })
@@ -34,7 +35,9 @@ const router = createRouter({
 router.beforeEach((to: EnhancedRouteLocation, from, next) => {
   // 开始显示进度条。
   NProgress.start()
-
+  if (to.path === '/login') {
+    stopCheckLoginTimer(); // 清除定时器
+  }
   if (to.meta.level > 0) {
     const token = localStorage.get(STORAGE_TOKEN_KEY)
     if (!token) {

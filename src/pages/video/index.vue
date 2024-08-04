@@ -127,7 +127,7 @@ function setup() {
                   ],
                   width:'100%',
                   height:'100%'
-                }"></video-player>
+                }" :video-id=item.videoUrl :title=item.title></video-player>
               </van-grid-item>
             </van-grid>
           </van-list>
