@@ -64,18 +64,23 @@ const defaultList = [
 
 const list = ref([...defaultList]);
 const barrage = ref<BarrageInstance>();
+const isPlay = ref(false);
+
 const add = () => {
   for (let i = 0; i < 5; i++) {
     list.value.push({ id: Math.random(), text: 'Barrage' });
   }
 };
 
-const [isPlay, toggle] = useToggle(false);
-
 watch(isPlay, () => {
-  if (isPlay.value) barrage.value?.play();
-  else barrage.value?.pause();
+  if (isPlay.value) {
+    barrage.value?.play()
+  } else {
+    barrage.value?.pause()
+  }
 });
+
+
 </script>
 
 <template>
@@ -84,8 +89,8 @@ watch(isPlay, () => {
       <video-player :options="videoOption"></video-player>
     </van-barrage>
     <van-cell-group inset style="margin-top: 16px;">
-      <van-cell title="弹幕" value="添加" :aria-disabled="isPlay" @click="add"/>
-      <van-cell title="弹幕" :value="isPlay ? '暂停' : '开始'" :aria-disabled="isPlay" @click="toggle"/>
+      <van-cell is-link title="弹幕" value="添加" :aria-disabled="isPlay" @click="add"/>
+      <van-cell is-link title="弹幕" :value="isPlay ? '暂停' : '开始'" @click="isPlay = !isPlay"/>
       <van-cell :title="item.id"/>
       <van-cell :title="item.title"/>
     </van-cell-group>
