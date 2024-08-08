@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref } from 'vue';
 import VideoPlayer from '@/components/VideoPlayer.vue'
 import { useRoute } from 'vue-router'
 import NProgress from 'nprogress'
@@ -16,7 +17,12 @@ definePage({
 })
 
 const route = useRoute();
-const item = reactive({})
+const item = reactive({
+  id: '',
+  title: '',
+  videoUrl: '',
+  imageUrl: ''
+})
 const isReady = ref(false)
 const videoOption = reactive({
   controls: true, // 是否显示控制条
@@ -80,6 +86,45 @@ watch(isPlay, () => {
   }
 });
 
+function copyId(id: string) {
+  //Ts + vue3 将Id复制到剪贴板
+  navigator.clipboard.writeText(id).then(() => {
+    console.log('ID copied to clipboard');
+  }, (err) => {
+    console.error('Failed to copy text: ', err);
+  });
+}
+
+const likeIcon = ref()
+const starIcon = ref()
+const likeItem = reactive({
+  iconColor: '',
+  icon: 'like-o'
+})
+const starItem = reactive({
+  iconColor: '',
+  icon: 'star-o'
+})
+
+const toLike = () => {
+  if (likeIcon.value.iconColor !== 'red') {
+    likeItem.iconColor = 'red'
+    likeItem.icon = 'like'
+  } else {
+    likeItem.iconColor = ''
+    likeItem.icon = 'like-o'
+  }
+
+}
+const toStar = () =>  {
+  if (starIcon.value.iconColor !== 'yellow') {
+    starItem.iconColor = 'yellow'
+    starItem.icon = 'star'
+  } else {
+    starItem.iconColor = ''
+    starItem.icon = 'star-o'
+  }
+}
 
 </script>
 
@@ -88,12 +133,26 @@ watch(isPlay, () => {
     <van-barrage ref="barrage" v-model="list" :auto-play="false" rows="5" >
       <video-player :options="videoOption"></video-player>
     </van-barrage>
-    <van-cell-group inset style="margin-top: 16px;">
+
+    <van-row>
+      <van-col span="20">
+        <van-grid style="margin: 8px 16px" square clickable :column-num="10" icon-size="14px" >
+          <van-grid-item ref="likeIcon" border="false" :icon="likeItem.icon" @click="toLike" :icon-color="likeItem.iconColor"/>
+          <van-grid-item ref="starIcon" border="false" :icon="starItem.icon" @click="toStar" :icon-color="starItem.iconColor"/>
+        </van-grid>
+      </van-col>
+      <van-col style="display: block; position: absolute; margin: 12px 0 0 80px;" span="20">{{ item.title }}</van-col>
+    </van-row>
+
+    <van-cell-group inset style="margin-top: 4px;">
+      <van-cell is-link :title="'ID: ' + item.id" @click="copyId(item.id)" />
+    </van-cell-group>
+
+    <van-cell-group inset style="margin-top: 4px;">
       <van-cell is-link title="弹幕" value="添加" :aria-disabled="isPlay" @click="add"/>
       <van-cell is-link title="弹幕" :value="isPlay ? '暂停' : '开始'" @click="isPlay = !isPlay"/>
-      <van-cell :title="item.id"/>
-      <van-cell :title="item.title"/>
     </van-cell-group>
+
   </Container>
 </template>
 
