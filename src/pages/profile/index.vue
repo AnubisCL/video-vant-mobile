@@ -88,7 +88,7 @@ async function signOut() {
             </van-space>
           </template>
           <template #right-icon>
-            <van-icon @click="router.push('/edit')" name="setting-o" class="search-icon"/>
+            <van-icon @click="router.push('/profile/edit')" name="setting-o" class="search-icon"/>
           </template>
         </van-cell>
         <van-cell center :title="t('profile.darkMode')">

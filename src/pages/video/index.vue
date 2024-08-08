@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import {ref} from 'vue';
-import VideoPlayer from '@/components/VideoPlayer.vue'
 import {getVideoList} from "@/api/video";
 import {showToast} from "vant";
+import router from "@/router";
 
 definePage({
   name: 'video',
   meta: {
     level: 1,
+    keepAlive: true
   },
 })
 
@@ -15,7 +16,7 @@ const {t} = useI18n()
 const list = ref([]);
 const pageReq = ref({
   current: 1,
-  size: 4,
+  size: 8,
   sortBy: "",
   asc: false
 });
@@ -47,7 +48,7 @@ async function onLoad() {
     }
     refreshing.value = false;
   }
-  let res = await getVideoList({},{
+  let res = await getVideoList({}, {
     keyword: keyword.value,
     page: pageReq.value
   })
@@ -107,31 +108,27 @@ function setup() {
         finished-text="没有更多了"
         @load="onLoad"
       >
-        <van-grid :border="false" :column-num="1" :gutter="3">
+        <van-grid :border="false" :column-num="2" :gutter="3">
           <van-grid-item v-for="item in list" :key="item.videoId" :title="item.title">
-            <video-player :options="{
-                  controls: true, // 是否显示控制条
-                  preload: 'none', //预加载
-                  poster: item.imageUrl, // 视频封面图地址
-                  autoplay: false, //自动播放
-                  fluid: true, // 自适应宽高
-                  language: 'zh-CN', // 设置语言
-                  muted: true, // 是否静音
-                  inactivityTimeout: false,
-                  sources: [
-                    {
-                      src: item.videoUrl,
-                      type:'application/x-mpegURL',
-                      // type: 'video/mp4'
-                    }
-                  ],
-                  width:'100%',
-                  height:'100%'
-                }" :video-id=item.videoUrl :title=item.title></video-player>
-              </van-grid-item>
-            </van-grid>
-          </van-list>
-        </van-pull-refresh>
+            <van-image lazy-load
+                       @click="router.push({path: '/video/info', query: {
+                         videoId: item.videoId,
+                         title: item.title,
+                         videoUrl: item.videoUrl,
+                         imageUrl: item.imageUrl
+                       }})"
+                       :src="item.imageUrl"
+                       fit="cover"
+                       width="100%"
+                       height="100%">
+              <template v-slot:loading>
+                <van-loading type="spinner" size="20" />
+              </template>
+            </van-image>
+          </van-grid-item>
+        </van-grid>
+      </van-list>
+    </van-pull-refresh>
     <van-back-top/>
   </Container>
 </template>
