@@ -39,6 +39,7 @@
     "signOut": "Sign Out"
   },
   "edit": {
+    "avatar": "Avatar",
     "username": "Username",
     "usernameMsg": "Please fill in your username",
     "email": "email",

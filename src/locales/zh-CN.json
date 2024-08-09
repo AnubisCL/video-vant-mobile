@@ -39,6 +39,7 @@
     "signOut": "退出登录"
   },
   "edit": {
+    "avatar": "头像",
     "username": "用户名",
     "usernameMsg": "请填写用户名",
     "email": "邮箱",

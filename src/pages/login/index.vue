@@ -36,7 +36,6 @@ async function onSubmit() {
     password: data.userForm.password
   }, );
   localStorage.set(HISTORY_ACCOUNT, data.userForm.account)
-  localStorage.set(HISTORY_PASSWORD, data.userForm.password)
   data.loginLoading = false
 }
 

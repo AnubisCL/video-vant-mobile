@@ -27,6 +27,8 @@ declare module 'vue-router/auto-routes' {
     'mock': RouteRecordInfo<'mock', '/mock', Record<never, never>, Record<never, never>>,
     'profile': RouteRecordInfo<'profile', '/profile', Record<never, never>, Record<never, never>>,
     'edit': RouteRecordInfo<'edit', '/profile/edit', Record<never, never>, Record<never, never>>,
+    'history': RouteRecordInfo<'history', '/profile/history', Record<never, never>, Record<never, never>>,
+    'collector': RouteRecordInfo<'collector', '/profile/star', Record<never, never>, Record<never, never>>,
     'search': RouteRecordInfo<'search', '/search', Record<never, never>, Record<never, never>>,
     'unocss': RouteRecordInfo<'unocss', '/unocss', Record<never, never>, Record<never, never>>,
     'video': RouteRecordInfo<'video', '/video', Record<never, never>, Record<never, never>>,
