@@ -2,6 +2,7 @@
 import { languageColumns, locale } from '@/utils/i18n'
 import useAppStore from "@/stores/modules/app";
 import useUserStore from "@/stores/modules/user";
+import {getAvatar} from "@/api/user";
 
 definePage({
   name: 'profile',
@@ -31,26 +32,33 @@ onMounted( () => {
   data.user.username = userStore.user.username
   data.user.email = userStore.user.email
   data.user.roleId = userStore.user.roleId
+  getAvatarBase64()
 })
-
-watch(
-  () => isDark.value,
+// 用户头像
+const avatar = ref('')
+async function getAvatarBase64() {
+  const res = await getAvatar()
+  if (res.success) {
+    avatar.value = res.data
+  }
+}
+// 暗黑模式
+watch(() => isDark.value,
   (newMode) => {
     checked.value = newMode
   },
   { immediate: true },
 )
-
 function toggle() {
   toggleDark()
   appStore.switchMode(isDark.value ? 'dark' : 'light')
 }
-
+//国际化
 function onLanguageConfirm(event: { selectedOptions: PickerColumn }) {
   locale.value = event.selectedOptions[0].value as string
   showLanguagePicker.value = false
 }
-
+//退出登录
 async function signOut() {
   await userStore.signOut()
   await router.replace('/login')
@@ -61,18 +69,16 @@ async function signOut() {
   <Container :padding-x="0" :padding-t="16" :padding-b="100">
     <van-cell-group inset>
         <van-cell :value="t('profile.edit')">
-          <!-- 使用 title 插槽来自定义标题 -->
           <template #title>
             <!-- 设置垂直 -->
             <van-space direction="vertical" fill>
-              <!-- todo:头像更换 -->
               <van-image
                 round
                 lazy-load
                 fit="cover"
                 width="100"
                 height="100"
-                src=""
+                :src="avatar"
               />
               <span class="custom-title">{{ data.user.username }}</span>
             </van-space>
@@ -103,13 +109,13 @@ async function signOut() {
           @click="showLanguagePicker = true"
         />
         <!-- todo:收藏 -->
-        <van-cell is-link :title="t('profile.collector')">
+        <van-cell is-link :title="t('profile.collector')" @click="router.push('/profile/star')">
           <template #right-icon>
             <van-icon name="star-o" class="search-icon"/>
           </template>
         </van-cell>
         <!-- todo:历史观看记录 -->
-        <van-cell is-link :title="t('profile.history')">
+        <van-cell is-link :title="t('profile.history')" @click="router.push('/profile/history')">
           <template #right-icon>
             <van-icon name="browsing-history-o" class="search-icon"/>
           </template>
