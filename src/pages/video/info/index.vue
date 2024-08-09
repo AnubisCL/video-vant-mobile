@@ -4,7 +4,18 @@ import VideoPlayer from '@/components/VideoPlayer.vue'
 import { useRoute } from 'vue-router'
 import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
-import type {BarrageInstance} from "vant"; // 延迟加载NProgress样式
+import type {BarrageInstance} from "vant";
+import {
+  collectDo,
+  historyCount,
+  historyDo,
+  isCollect,
+  isLike,
+  likeCount,
+  likeDo,
+  removeCollect,
+  removeLike
+} from "@/api/video"; // 延迟加载NProgress样式
 
 definePage({
   name: 'videoInfo',
@@ -39,7 +50,7 @@ const videoOption = reactive({
 })
 
 
-onMounted(() => {
+onMounted( () => {
   NProgress.start()
   item.id = splitVideoId
   item.title = route.query.title
@@ -51,8 +62,44 @@ onMounted(() => {
   }]
   videoOption.poster = route.query.imageUrl
   route.meta.title = item.title
+  initVideoInfo()
+  historyDo(item.id)
   NProgress.done()
 })
+
+const likeNum = ref(0)
+const historyNum = ref(0)
+const isLikeStatus = ref(false)
+const isStarStatus = ref(false)
+async function initVideoInfo() {
+  let count = await likeCount(item.id);
+  if (count.success) {
+    likeItem.badge = count.data
+  }
+
+  let his = await historyCount(item.id);
+  if (his.success) {
+    historyItem.badge = his.data
+  }
+
+  //获取视频点赞&收藏状态
+  let resLike = await isLike(item.id)
+  if (resLike.success) {
+    isLikeStatus.value = resLike.data
+    if (resLike.data) {
+      likeItem.iconColor = 'red'
+      likeItem.icon = 'like'
+    }
+  }
+  let resCollect = await isCollect(item.id)
+  if (resCollect.success) {
+    isStarStatus.value = resCollect.data
+    if (resCollect.data) {
+      starItem.iconColor = 'yellow'
+      starItem.icon = 'star'
+    }
+  }
+}
 
 const splitVideoId = computed(() => {
   return route.query.videoUrl.split('/')[4]
@@ -95,34 +142,58 @@ function copyId(id: string) {
   });
 }
 
-const likeIcon = ref()
-const starIcon = ref()
 const likeItem = reactive({
   iconColor: '',
-  icon: 'like-o'
+  icon: 'like-o',
+  badge: 0
 })
 const starItem = reactive({
   iconColor: '',
-  icon: 'star-o'
+  icon: 'star-o',
+  badge: 0
+})
+const historyItem = reactive({
+  iconColor: '#ee3f0a',
+  icon: 'fire-o',
+  badge: 0
 })
 
-const toLike = () => {
-  if (likeIcon.value.iconColor !== 'red') {
-    likeItem.iconColor = 'red'
-    likeItem.icon = 'like'
+const toLike = async () => {
+  if (isLikeStatus.value) {
+    let res = await removeLike(item.id)
+    if (res.success) {
+      likeItem.iconColor = ''
+      likeItem.icon = 'like-o'
+      isLikeStatus.value = false
+      likeItem.badge = likeItem.badge - 1
+    }
   } else {
-    likeItem.iconColor = ''
-    likeItem.icon = 'like-o'
+    let res = await likeDo('video', item.id)
+    if (res.success) {
+      likeItem.iconColor = '#ee0a0a'
+      likeItem.icon = 'like'
+      isLikeStatus.value = true
+      likeItem.badge = likeItem.badge + 1
+    }
   }
-
 }
-const toStar = () =>  {
-  if (starIcon.value.iconColor !== 'yellow') {
-    starItem.iconColor = 'yellow'
-    starItem.icon = 'star'
+const toStar = async () =>  {
+  if (isStarStatus.value) {
+    let res = await removeCollect(item.id)
+    if (res.success) {
+      starItem.iconColor = ''
+      starItem.icon = 'star-o'
+      isStarStatus.value = false
+      starItem.badge = starItem.badge - 1
+    }
   } else {
-    starItem.iconColor = ''
-    starItem.icon = 'star-o'
+    let res = await collectDo(item.id)
+    if (res.success) {
+      starItem.iconColor = '#eed00a'
+      starItem.icon = 'star'
+      isStarStatus.value = true
+      starItem.badge = starItem.badge + 1
+    }
   }
 }
 
@@ -134,15 +205,29 @@ const toStar = () =>  {
       <video-player :options="videoOption"></video-player>
     </van-barrage>
 
-    <van-row>
-      <van-col span="20">
-        <van-grid style="margin: 8px 16px" square clickable :column-num="10" icon-size="14px" >
-          <van-grid-item ref="likeIcon" border="false" :icon="likeItem.icon" @click="toLike" :icon-color="likeItem.iconColor"/>
-          <van-grid-item ref="starIcon" border="false" :icon="starItem.icon" @click="toStar" :icon-color="starItem.iconColor"/>
-        </van-grid>
+    <van-row justify="center">
+      <van-col style="text-align: center;" span="5">
+        <van-button style="margin: 7px 0;" size="mini" round type="default" :icon="historyItem.icon" :color="historyItem.iconColor">
+          <van-rolling-text :start-num="0" :target-num="historyItem.badge" />
+        </van-button>
       </van-col>
-      <van-col style="display: block; position: absolute; margin: 12px 0 0 80px;" span="20">{{ item.title }}</van-col>
+      <van-col style="text-align: center;" span="5" offset="7">
+        <van-button style="margin: 7px 0;" size="mini" round type="default" @click="toLike" :icon="likeItem.icon" :color="likeItem.iconColor">
+          <van-rolling-text :start-num="0" :target-num="likeItem.badge" />
+        </van-button>
+      </van-col>
+      <van-col style="text-align: center;" >
+        <van-button style="margin: 7px 0;" size="mini" round type="default" @click="toStar" :icon="starItem.icon" :color="starItem.iconColor">
+          <van-rolling-text :start-num="0" :target-num="starItem.badge" />
+        </van-button>
+      </van-col>
     </van-row>
+    <van-row justify="center">
+      <van-col style="margin: 5px 0;" span="20">
+        <van-text-ellipsis :content="item.title" expand-text="展开" collapse-text="收起" />
+      </van-col>
+    </van-row>
+
 
     <van-cell-group inset style="margin-top: 4px;">
       <van-cell is-link :title="'ID: ' + item.id" @click="copyId(item.id)" />
