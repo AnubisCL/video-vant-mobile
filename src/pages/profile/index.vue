@@ -108,13 +108,11 @@ async function signOut() {
           :value="language"
           @click="showLanguagePicker = true"
         />
-        <!-- todo:收藏 -->
         <van-cell is-link :title="t('profile.collector')" @click="router.push('/profile/star')">
           <template #right-icon>
             <van-icon name="star-o" class="search-icon"/>
           </template>
         </van-cell>
-        <!-- todo:历史观看记录 -->
         <van-cell is-link :title="t('profile.history')" @click="router.push('/profile/history')">
           <template #right-icon>
             <van-icon name="browsing-history-o" class="search-icon"/>

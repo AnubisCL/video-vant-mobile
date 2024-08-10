@@ -15,6 +15,7 @@ const { t } = useI18n()
 
 <template>
   <Container :padding-x="0">
+    <!-- todo:收藏 -->
     <h1>收藏记录</h1>
   </Container>
 </template>

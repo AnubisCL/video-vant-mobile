@@ -92,6 +92,7 @@ function setup() {
 
 <template>
   <Container :padding-x="0" :padding-t="0" :padding-b="100">
+    <!-- todo: 搜索bug，结果需要刷新才显示  -->
     <van-search
       v-model="keyword"
       @search="onSearch"
@@ -101,6 +102,7 @@ function setup() {
       :background='"#3c9d8b"'
       placeholder="请输入搜索关键词"
     />
+    <!-- todo: 更改分页方式，下滑加载太多gif页面会卡死  -->
     <van-pull-refresh v-model="refreshing" @refresh="onRefresh">
       <van-list
         v-model:loading="loading"
