@@ -2,6 +2,7 @@
 import { showToast } from 'vant'
 import useUserStore from '@/stores/modules/user'
 import { getAvatar, updateUserInfo, uploadAvatar } from '@/api/user'
+import enums from '@/utils/enums'
 
 definePage({
   name: 'edit',
@@ -61,6 +62,7 @@ async function onSubmit() {
     username: editForm.username,
     email: editForm.email,
     password: editForm.password,
+    signType: enums.LOGIN_STATUS.LOGIN_IN,
   })
   if (res.success) {
     showToast(t('button.editSuc'))
