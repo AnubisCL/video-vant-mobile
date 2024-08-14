@@ -55,7 +55,11 @@
     "SignOut": "Sign Out",
     "signUp": "Sign Up",
     "signIn": "Sign In",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "uploadSuc": "Upload Success",
+    "uploadErr": "Upload Failed",
+    "editSuc": "Modify Success",
+    "editErr": "Modify Failed"
   },
   "video": {
     "info": "Video Detail",

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { showToast } from 'vant'
 import useUserStore from '@/stores/modules/user'
-import { getAvatar, uploadAvatar } from '@/api/user'
+import { getAvatar, updateUserInfo, uploadAvatar } from '@/api/user'
 
 definePage({
   name: 'edit',
@@ -48,15 +48,26 @@ async function afterRead(file: any) {
   const res = await uploadAvatar({}, formData)
   if (res.success) {
     await getAvatarBase64()
-    showToast('上传成功')
+    showToast(t('button.uploadSuc'))
   }
   else {
-    showToast('上传失败')
+    showToast(t('button.uploadErr'))
   }
 }
 
+// 提交
 async function onSubmit() {
-  // todo：修改个人信息
+  const res = await updateUserInfo({}, {
+    username: editForm.username,
+    email: editForm.email,
+    password: editForm.password,
+  })
+  if (res.success) {
+    showToast(t('button.editSuc'))
+  }
+  else {
+    showToast(t('button.editErr'))
+  }
 }
 
 // const beforeRead = (file) => {

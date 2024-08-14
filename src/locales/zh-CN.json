@@ -55,7 +55,11 @@
     "logout": "退出登录",
     "signUp": "注册",
     "signIn": "登录",
-    "cancel": "取消"
+    "cancel": "取消",
+    "uploadSuc": "上传成功",
+    "uploadErr": "上传失败",
+    "editSuc": "修改成功",
+    "editErr": "修改失败"
   },
   "video": {
     "info": "视频详情",

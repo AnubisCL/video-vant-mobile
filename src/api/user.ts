@@ -8,3 +8,7 @@ export function uploadAvatar(params?: any, data?: any) {
 export function getAvatar(params?: any, data?: any) {
   return request({ url: '/user/get-avatar', method: 'get', params, data })
 }
+
+export function updateUserInfo(params?: any, data?: any) {
+  return request({ url: '/user/updateUserInfo', method: 'post', params, data })
+}
