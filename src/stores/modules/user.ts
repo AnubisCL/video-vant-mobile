@@ -57,7 +57,7 @@ const useUserStore = defineStore('user', () => {
       // 3.menu
       const resMenu = await getMenuList()
       if (resMenu.success) {
-        // todo：菜单Router控制
+        // fixme：菜单Router控制
         // 实现动态路由更新逻辑
         // 可以在这里根据返回的菜单数据动态生成路由
       }

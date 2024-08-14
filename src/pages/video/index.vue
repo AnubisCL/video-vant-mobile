@@ -119,7 +119,6 @@ const onRefresh = () => {
 
 <template>
   <Container :padding-x="0" :padding-t="0" :padding-b="100">
-    <!-- todo: 搜索bug，结果需要刷新才显示  -->
     <van-search
       v-model="keyword"
       :disabled="loading"

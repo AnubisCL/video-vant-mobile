@@ -22,7 +22,7 @@ export async function startCheckLoginTimer() {
       })
       router.replace('/login')
     }
-  }, 50000) // todo 修改为配置项
+  }, 30000)
 }
 
 export function stopCheckLoginTimer() {

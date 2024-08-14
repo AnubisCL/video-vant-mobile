@@ -53,7 +53,7 @@ onMounted(() => {
 <template>
   <!-- 提供主题配置的上下文 -->
   <VanConfigProvider :theme="mode">
-    <!-- TODO 和路由国际化相关 -->
+    <!-- 和路由国际化相关 -->
     <NavBar />
     <!-- 根据路由切换组件，并应用过渡效果 -->
     <router-view v-slot="{ Component, route }">
