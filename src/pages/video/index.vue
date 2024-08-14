@@ -3,6 +3,7 @@ import {ref} from 'vue';
 import {getVideoList} from "@/api/video";
 import {showToast} from "vant";
 import router from "@/router";
+import NProgress from "nprogress";
 
 definePage({
   name: 'video',
@@ -14,38 +15,66 @@ definePage({
 
 const {t} = useI18n()
 const list = ref([]);
-const pageReq = ref({
-  current: 1,
+const pageReq = reactive({
+  current: 0,
   size: 8,
   sortBy: "",
   asc: false
 });
-const pageRes = ref({
+const pageRes = reactive({
   pages: 0,
   total: 0
 });
-const loading = ref(false);
-const finished = ref(false);
-const refreshing = ref(false);
 const keyword = ref("");
-
+const loading = ref(false);
 const onSearch = (val) => {
+  loading.value = true
   showToast(val)
-  onRefresh()
+  pageReq.current = 0
+  nextPage()
+  loading.value = false
 };
 const onCancel = () => {
-  showToast('取消')
+  showToast(t('button.cancel'))
 };
 
+onMounted(() => {
+  nextPage()
+})
+const nextPage = async () => {
+  NProgress.start()
+  list.value = []
+  let res = await getVideoList({}, {
+    keyword: keyword.value,
+    page: pageReq
+  })
+  if (res.success) {
+    const records = res.data.records
+    if (records.length > 0) {
+      records.forEach((item: any) => {
+        list.value.push(item);
+      });
+      pageRes.pages = res.data.pages
+      pageRes.total = res.data.total
+    } else {
+      showToast(t('video.noMore'))
+    }
+  } else {
+    showToast(t('video.error'))
+  }
+  NProgress.done()
+}
+
+/*
+const finished = ref(false);
+const refreshing = ref(false);
 async function onLoad() {
   if (refreshing.value) {
     list.value = [];
-    pageReq.value = {
-      current: 1,
-      size: 4,
-      sortBy: "",
-      asc: false
-    }
+    pageReq.current = 1
+    pageReq.size = 4
+    pageReq.sortBy = ""
+    pageReq.asc = false
     refreshing.value = false;
   }
   let res = await getVideoList({}, {
@@ -58,9 +87,9 @@ async function onLoad() {
       records.forEach((item: any) => {
         list.value.push(item);
       });
-      pageReq.value.current = pageReq.value.current + 1
-      pageRes.value.pages = res.data.pages
-      pageRes.value.total = res.data.total
+      pageReq.current = pageReq.current + 1
+      pageRes.pages = res.data.pages
+      pageRes.total = res.data.total
     } else {
       finished.value = true;
     }
@@ -76,18 +105,7 @@ const onRefresh = () => {
   // 将 loading 设置为 true，表示处于加载状态
   loading.value = true;
   onLoad();
-};
-
-function setup() {
-  return {
-    list,
-    onLoad,
-    loading,
-    finished,
-    onRefresh,
-    refreshing,
-  };
-}
+};*/
 </script>
 
 <template>
@@ -99,38 +117,71 @@ function setup() {
       @cancel="onCancel"
       :disabled="loading"
       shape="round"
-      :background='"#3c9d8b"'
+      :background='"rgba(60,99,157,0.94)"'
       placeholder="请输入搜索关键词"
     />
-    <!-- todo: 更改分页方式，下滑加载太多gif页面会卡死  -->
-    <van-pull-refresh v-model="refreshing" @refresh="onRefresh">
-      <van-list
-        v-model:loading="loading"
-        :finished="finished"
-        finished-text="没有更多了"
-        @load="onLoad"
-      >
-        <van-grid :border="false" :column-num="2" :gutter="3">
-          <van-grid-item v-for="item in list" :key="item.videoId" :title="item.title">
-            <van-image lazy-load
-                       @click="router.push({path: '/video/info', query: {
-                         videoId: item.videoId,
-                         title: item.title,
-                         videoUrl: item.videoUrl,
-                         imageUrl: item.imageUrl
-                       }})"
-                       :src="item.imageUrl"
-                       fit="cover"
-                       width="100%"
-                       height="100%">
-              <template v-slot:loading>
-                <van-loading type="spinner" size="20" />
-              </template>
-            </van-image>
-          </van-grid-item>
-        </van-grid>
-      </van-list>
-    </van-pull-refresh>
+    <van-grid :border="false" :column-num="2" :gutter="3">
+      <van-grid-item v-for="item in list" :key="item.videoId" :title="item.title">
+        <van-image lazy-load
+                   @click="router.push({path: '/video/info', query: {
+                             videoId: item.videoId,
+                             title: item.title,
+                             videoUrl: item.videoUrl,
+                             imageUrl: item.imageUrl
+                           }})"
+                   :src="item.imageUrl"
+                   fit="cover"
+                   width="100%"
+                   height="100%">
+          <template v-slot:loading>
+            <van-loading type="spinner" size="20" />
+          </template>
+        </van-image>
+      </van-grid-item>
+    </van-grid>
+    <van-pagination
+      v-model="pageReq.current"
+      :items-per-page="pageReq.size"
+      :total-items="pageRes.total"
+      :page-count="pageRes.pages"
+      show-page-size="7"
+      @change="nextPage">
+      <template #prev-text>
+        <van-icon name="arrow-left" />
+      </template>
+      <template #next-text>
+        <van-icon name="arrow" />
+      </template>
+      <template #page="{ text }">{{ text }}</template>
+    </van-pagination>
+    <!--    <van-pull-refresh v-model="refreshing" @refresh="onRefresh">
+          <van-list
+            v-model:loading="loading"
+            :finished="finished"
+            finished-text="没有更多了"
+            @load="onLoad"
+          >
+            <van-grid :border="false" :column-num="2" :gutter="3">
+              <van-grid-item v-for="item in list" :key="item.videoId" :title="item.title">
+                <van-image lazy-load
+                           @click="router.push({path: '/video/info', query: {
+                             videoId: item.videoId,
+                             title: item.title,
+                             videoUrl: item.videoUrl,
+                             imageUrl: item.imageUrl
+                           }})"
+                           :src="item.imageUrl"
+                           fit="cover"
+                           width="100%"
+                           height="100%">
+                  <template v-slot:loading>
+                    <van-loading type="spinner" size="20" />
+                  </template>
+                </van-image>
+              </van-grid-item>
+            </van-grid>
+          </van-list>
+        </van-pull-refresh>-->
     <van-back-top/>
   </Container>
 </template>

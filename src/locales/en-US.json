@@ -54,10 +54,13 @@
     "edit": "Modify",
     "SignOut": "Sign Out",
     "signUp": "Sign Up",
-    "signIn": "Sign In"
+    "signIn": "Sign In",
+    "cancel": "Cancel"
   },
   "video": {
-    "info": "Video Detail"
+    "info": "Video Detail",
+    "error": "Get Video List Error",
+    "noMore": "No More Video"
   },
   "keepAlive": {
     "label": "The current component will be cached"

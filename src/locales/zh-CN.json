@@ -54,10 +54,13 @@
     "edit": "修改",
     "logout": "退出登录",
     "signUp": "注册",
-    "signIn": "登录"
+    "signIn": "登录",
+    "cancel": "取消"
   },
   "video": {
-    "info": "视频详情"
+    "info": "视频详情",
+    "error": "视频列表请求失败",
+    "noMore": "没有更多视频了"
   },
   "keepAlive": {
     "label": "当前组件将会被缓存"
