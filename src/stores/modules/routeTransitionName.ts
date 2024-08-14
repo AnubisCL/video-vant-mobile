@@ -20,7 +20,7 @@ const useRouteTransitionNameStore = defineStore('route-transition-name', () => {
 
   /**
    * 返回store的状态和方法。
-   * @returns {Object} - 包含routeTransitionName和setName的方法的对象。
+   * @returns {object} - 包含routeTransitionName和setName的方法的对象。
    */
   return {
     routeTransitionName,

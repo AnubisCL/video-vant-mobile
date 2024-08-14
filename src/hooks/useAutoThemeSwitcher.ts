@@ -60,4 +60,3 @@ export default function useAutoThemeSwitcher(appStore: AppStore) {
 
   return { initializeThemeSwitcher }
 }
-

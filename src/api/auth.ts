@@ -24,4 +24,3 @@ export function getPermissionList(params?: any, data?: any) {
 export function getMenuList(params?: any, data?: any) {
   return request({ url: '/authentication/getMenuList', method: 'get', params, data })
 }
-

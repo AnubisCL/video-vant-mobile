@@ -1,16 +1,14 @@
 <script setup lang="ts">
-import useUserStore from "@/stores/modules/user";
 definePage({
   name: 'history',
   meta: {
     level: 2,
     title: '历史记录',
     i18n: 'profile.history',
-  }
+  },
 })
-const userStore = useUserStore();
-const { t } = useI18n()
-
+// const userStore = useUserStore()
+// const { t } = useI18n()
 </script>
 
 <template>

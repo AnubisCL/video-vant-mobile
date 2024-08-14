@@ -23,7 +23,7 @@ export default ({ mode }: ConfigEnv): UserConfig => {
           target: 'http://127.0.0.1:7077/',
           ws: false,
           changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api/, ''),
+          rewrite: path => path.replace(/^\/api/, ''),
         },
       },
     },

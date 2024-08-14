@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import useUserStore from "@/stores/modules/user";
-import {showToast} from "vant";
-import {getAvatar, uploadAvatar} from "@/api/user";
+import { showToast } from 'vant'
+import useUserStore from '@/stores/modules/user'
+import { getAvatar, uploadAvatar } from '@/api/user'
 
 definePage({
   name: 'edit',
@@ -9,10 +9,10 @@ definePage({
     level: 2,
     title: '个人信息修改',
     i18n: 'profile.editUserInfo',
-  }
+  },
 })
 
-const userStore = useUserStore();
+const userStore = useUserStore()
 const { t } = useI18n()
 
 const data = reactive({
@@ -20,10 +20,10 @@ const data = reactive({
     username: '',
     email: '',
     password: '',
-  }
+  },
 })
 
-onMounted( () => {
+onMounted(() => {
   data.editForm.username = userStore.user.username
   data.editForm.email = userStore.user.email
   getAvatarBase64()
@@ -40,19 +40,20 @@ async function getAvatarBase64() {
   }
   avatarLoad.value = false
 }
-//上传完成
-const afterRead = async (file) => {
-  const formData = new FormData();
-  formData.append('file', file.file);
+// 上传完成
+async function afterRead(file) {
+  const formData = new FormData()
+  formData.append('file', file.file)
   // 此时可以自行将文件上传至服务器
   const res = await uploadAvatar({}, formData)
   if (res.success) {
     await getAvatarBase64()
-    showToast('上传成功');
-  } else {
-    showToast('上传失败');
+    showToast('上传成功')
   }
-};
+  else {
+    showToast('上传失败')
+  }
+}
 
 // const beforeRead = (file) => {
 //   debugger
@@ -63,7 +64,6 @@ const afterRead = async (file) => {
 //   return true;
 // };
 
-
 async function onSubmit() {
   // todo：修改个人信息
 }
@@ -71,7 +71,7 @@ async function onSubmit() {
 
 <template>
   <Container :padding-x="0">
-    <van-form @submit="">
+    <van-form @submit="onSubmit">
       <van-cell-group inset>
         <van-field name="uploader" :label="t('edit.avatar')">
           <template #input>
@@ -85,7 +85,7 @@ async function onSubmit() {
                 height="100"
                 :src="avatar"
               >
-                <template v-slot:loading>
+                <template #loading>
                   <van-loading type="spinner" size="20" />
                 </template>
               </van-image>

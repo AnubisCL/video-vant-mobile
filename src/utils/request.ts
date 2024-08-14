@@ -1,8 +1,8 @@
-import type { AxiosError, InternalAxiosRequestConfig, AxiosRequestConfig } from 'axios'
+import type { AxiosError, AxiosRequestConfig, InternalAxiosRequestConfig } from 'axios'
 import axios from 'axios'
 import { showNotify } from 'vant'
 import { STORAGE_TOKEN_KEY } from '@/stores/mutation-type'
-import {localStorage} from "@/utils/local-storage";
+import { localStorage } from '@/utils/local-storage'
 // 这里是用于设定请求后端时，所用的 Token KEY
 // 可以根据自己的需要修改，常见的如 Access-Token，Authorization
 // 需要注意的是，请尽量保证使用中横线`-` 来作为分隔符，
@@ -77,14 +77,14 @@ export async function request<T = any>(config: AxiosRequestConfig): Promise<ApiR
    * */
   return axiosInstance.request<T>(config)
     .then(({ code, msg, data }) => {
-      if (code == 1 && msg === '登录已失效') {
+      if (code === 1 && msg === '登录已失效') {
         localStorage.set(STORAGE_TOKEN_KEY, '')
         showNotify({
           type: 'danger',
-          message: msg
+          message: msg,
         })
       }
-      return { success: code == 0, data: data, message: msg } as const
+      return { success: code === 0, data, message: msg } as const
     })
     .catch((err) => {
       return { success: false, data: err, message: err.message } as const

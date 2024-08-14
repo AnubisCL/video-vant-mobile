@@ -10,7 +10,5 @@ definePage({
 </script>
 
 <template>
-  <Container>
-
-  </Container>
+  <Container />
 </template>

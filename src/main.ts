@@ -1,5 +1,6 @@
 import { createApp } from 'vue'
 import { createHead } from '@unhead/vue'
+import { Lazyload } from 'vant'
 import App from '@/App.vue'
 import router from '@/router'
 import pinia from '@/stores'
@@ -10,7 +11,6 @@ import { i18n } from '@/utils/i18n'
 
 // Vant 桌面端适配
 import '@vant/touch-emulator'
-import { Lazyload } from 'vant';
 
 /* --------------------------------
 Vant 中有个别组件是以函数的形式提供的，

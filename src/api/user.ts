@@ -8,4 +8,3 @@ export function uploadAvatar(params?: any, data?: any) {
 export function getAvatar(params?: any, data?: any) {
   return request({ url: '/user/get-avatar', method: 'get', params, data })
 }
-

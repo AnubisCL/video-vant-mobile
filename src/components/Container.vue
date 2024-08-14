@@ -2,9 +2,9 @@
 /**
  * 组件定义Props
  *
- * @prop {Number} paddingT - 上内边距的值，默认为46。用于设置组件上边界的内边距。
- * @prop {Number} paddingB - 下内边距的值，默认为0。用于设置组件上边界的内边距。
- * @prop {Number} paddingX - 水平内边距的值，默认为16。用于设置组件左右两边的内边距。
+ * @prop {number} paddingT - 上内边距的值，默认为46。用于设置组件上边界的内边距。
+ * @prop {number} paddingB - 下内边距的值，默认为0。用于设置组件上边界的内边距。
+ * @prop {number} paddingX - 水平内边距的值，默认为16。用于设置组件左右两边的内边距。
  */
 defineProps({
   paddingT: {
