@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { PickerColumn } from 'vant'
 import { languageColumns, locale } from '@/utils/i18n'
 import useAppStore from '@/stores/modules/app'
 import useUserStore from '@/stores/modules/user'
@@ -19,46 +20,48 @@ const router = useRouter()
 const showLanguagePicker = ref(false)
 const languageValues = ref<Array<string>>([locale.value])
 const language = computed(() => languageColumns.find(l => l.value === locale.value).text)
-
-const data = reactive({
-  user: {
-    username: '',
-    email: '',
-    roleId: 0,
-  },
-})
-
-onMounted(() => {
-  data.user.username = userStore.user.username
-  data.user.email = userStore.user.email
-  data.user.roleId = userStore.user.roleId
-  getAvatarBase64()
+// 用户信息
+const user = reactive({
+  username: '',
+  email: '',
+  roleId: 0,
 })
 // 用户头像
 const avatar = ref('')
-async function getAvatarBase64() {
-  const res = await getAvatar()
-  if (res.success) {
-    avatar.value = res.data
-  }
-}
+
+onMounted(() => {
+  user.username = userStore.user.username
+  user.email = userStore.user.email
+  user.roleId = userStore.user.roleId
+  getAvatarBase64()
+})
 // 暗黑模式
 watch(() => isDark.value, (newMode) => {
   checked.value = newMode
 }, { immediate: true })
+
 function toggle() {
   toggleDark()
   appStore.switchMode(isDark.value ? 'dark' : 'light')
 }
+
 // 国际化
 function onLanguageConfirm(event: { selectedOptions: PickerColumn }) {
   locale.value = event.selectedOptions[0].value as string
   showLanguagePicker.value = false
 }
+
 // 退出登录
 async function signOut() {
-  await userStore.signOut()
+  await userStore.signOutFun()
   await router.replace('/login')
+}
+// 获取头像
+async function getAvatarBase64() {
+  const res = await getAvatar()
+  if (res.success) {
+    avatar.value = res.data
+  }
 }
 </script>
 
@@ -77,21 +80,24 @@ async function signOut() {
               height="100"
               :src="avatar"
             />
-            <span class="custom-title">{{ data.user.username }}</span>
+            <span class="custom-title">{{ user.username }}</span>
           </van-space>
         </template>
         <template #label>
-          <span>{{ data.user.email }}</span>
+          <span>{{ user.email }}</span>
         </template>
         <template #value>
           <van-space direction="vertical" fill>
-            <van-tag v-if="data.user.roleId === 1" style="margin-top: 40px; right: 80px;" size="large" type="danger">
+            <van-tag v-if="user.roleId === 1" style="margin-top: 40px; right: 80px;" size="large" type="danger">
               {{ t('profile.admin') }}
             </van-tag>
-            <van-tag v-if="data.user.roleId === 2 || data.user.roleId === 4" style="margin-top: 40px; right: 80px;" size="large" type="primary">
+            <van-tag
+              v-if="user.roleId === 2 || user.roleId === 4" style="margin-top: 40px; right: 80px;" size="large"
+              type="primary"
+            >
               {{ t('profile.normal') }}
             </van-tag>
-            <van-tag v-if="data.user.roleId === 3" style="margin-top: 40px; right: 80px;" size="large" type="warning">
+            <van-tag v-if="user.roleId === 3" style="margin-top: 40px; right: 80px;" size="large" type="warning">
               {{ t('profile.vip') }}
             </van-tag>
           </van-space>

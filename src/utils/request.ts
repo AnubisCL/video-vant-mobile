@@ -1,8 +1,9 @@
-import type { AxiosError, AxiosRequestConfig, InternalAxiosRequestConfig } from 'axios'
+import type { AxiosError, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
 import axios from 'axios'
 import { showNotify } from 'vant'
 import { STORAGE_TOKEN_KEY } from '@/stores/mutation-type'
 import { localStorage } from '@/utils/local-storage'
+import router from '@/router'
 // 这里是用于设定请求后端时，所用的 Token KEY
 // 可以根据自己的需要修改，常见的如 Access-Token，Authorization
 // 需要注意的是，请尽量保证使用中横线`-` 来作为分隔符，
@@ -21,27 +22,28 @@ export type RequestError = AxiosError<{
   errorMessage?: string
 }>
 
-// 异常拦截处理器
-function errorHandler(error: RequestError): Promise<any> {
+// 异常拦截处理器 不管异常还是正常请求统一返回 AxiosResponse
+function errorHandler(error: RequestError): AxiosResponse {
   if (error.response) {
     const { data = {}, status, statusText } = error.response
-    // 403 无权限
-    if (status === 403) {
+    // 500 服务端报错提示
+    if (status === 500) {
       showNotify({
         type: 'danger',
-        message: (data && data.message) || statusText,
+        message: error.message,
       })
     }
-    // 401 未登录/未授权
-    if (status === 401 && data.result && data.result.isLogin) {
-      showNotify({
-        type: 'danger',
-        message: '未授权登录',
-      })
-      location.replace('/login')
-    }
+    // fixme 其他报错提示处理(重试，幂等，限流，降级，熔断)
+    showNotify({
+      type: 'danger',
+      message: (data && data.message) || statusText,
+    })
   }
-  return Promise.reject(error)
+  return {
+    data: error.response.data,
+    status: error.response.status,
+    statusText: error.message,
+  } as AxiosResponse
 }
 
 // 请求拦截器
@@ -57,9 +59,13 @@ function requestHandler(config: InternalAxiosRequestConfig): InternalAxiosReques
 // Add a request interceptor
 axiosInstance.interceptors.request.use(requestHandler, errorHandler)
 
-// 响应拦截器
+// 响应拦截器 这边不需要考虑服务端直接报错，在errorHandler处理报错
 function responseHandler(response: { data: any }) {
-  return response.data
+  return {
+    data: response.data.data,
+    status: response.data.code,
+    statusText: response.data.msg,
+  } as AxiosResponse
 }
 
 // Add a response interceptor
@@ -72,21 +78,22 @@ export interface ApiResponse<T = any> {
 }
 
 export async function request<T = any>(config: AxiosRequestConfig): Promise<ApiResponse<T>> {
-  /*
-   *  then和catch里面返回的数据必须加as const，否则调用方无法推断出类型
-   * */
+  // then和catch里面返回的数据必须加as const，否则调用方无法推断出类型
   return axiosInstance.request<T>(config)
-    .then(({ code, msg, data }) => {
-      if (code === 1 && msg === '登录已失效') {
+    .then(({ data, status, statusText }) => {
+      // 服务端业务报错处理
+      if (status === 1 && statusText === '登录已失效') {
         localStorage.set(STORAGE_TOKEN_KEY, '')
         showNotify({
           type: 'danger',
-          message: msg,
+          message: statusText,
         })
+        // 登录失效直接跳转到登录
+        router.replace('/login')
       }
-      return { success: code === 0, data, message: msg } as const
-    })
-    .catch((err) => {
-      return { success: false, data: err, message: err.message } as const
+      return { success: status === 0, data, message: statusText } as const
+    }).catch(({ data, statusText }) => {
+      // 经过 errorHandler 后续返回给具体请求
+      return { success: false, data, message: statusText } as const
     })
 }

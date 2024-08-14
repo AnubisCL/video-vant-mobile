@@ -12,7 +12,7 @@ export async function startCheckLoginTimer() {
           type: 'danger',
           message: res.message,
         })
-        router.push('/login')
+        router.replace('/login')
       }
     }
     else {
@@ -20,9 +20,9 @@ export async function startCheckLoginTimer() {
         type: 'danger',
         message: '登录状态验证失败',
       })
-      router.push('/login')
+      router.replace('/login')
     }
-  }, 30000)
+  }, 50000) // todo 修改为配置项
 }
 
 export function stopCheckLoginTimer() {

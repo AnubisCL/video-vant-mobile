@@ -29,7 +29,7 @@ definePage({
 })
 
 const route = useRoute()
-const item = reactive({
+const videoItem = reactive({
   id: '',
   title: '',
   videoUrl: '',
@@ -48,29 +48,20 @@ const videoOption = reactive({
   width: '100%',
   height: '100%',
 })
-const splitVideoId = computed(() => {
-  return route.query.videoUrl.split('/')[4]
-})
 
-onMounted(() => {
-  NProgress.start()
-  item.id = splitVideoId
-  item.title = route.query.title
-  item.videoUrl = route.query.videoUrl
-  videoOption.sources = [{
-    src: route.query.videoUrl,
-    type: 'application/x-mpegURL',
-    // type: 'video/mp4'
-  }]
-  videoOption.poster = route.query.imageUrl
-  route.meta.title = item.title
-  initVideoInfo()
-  historyDo(item.id)
-  NProgress.done()
+const splitVideoId = computed<string>(() => {
+  // 确保 videoUrl 是一个字符串
+  const videoUrl = route.query.videoUrl as string
+  if (!videoUrl) {
+    return ''
+  }
+  // 分割字符串并获取第四个元素
+  return videoUrl.split('/')[4] || ''
 })
 
 const isLikeStatus = ref(false)
 const isStarStatus = ref(false)
+
 const likeItem = reactive({
   iconColor: '',
   icon: 'like-o',
@@ -87,19 +78,36 @@ const historyItem = reactive({
   badge: 0,
 })
 
+onMounted(() => {
+  NProgress.start()
+  videoItem.id = splitVideoId.value
+  videoItem.title = route.query.title as string
+  videoItem.videoUrl = route.query.videoUrl as string
+  videoOption.sources = [{
+    src: route.query.videoUrl,
+    type: 'application/x-mpegURL',
+    // type: 'video/mp4'
+  }]
+  videoOption.poster = route.query.imageUrl as string
+  route.meta.title = videoItem.title
+  initVideoInfo()
+  historyDo(videoItem.id)
+  NProgress.done()
+})
+
 async function initVideoInfo() {
-  const count = await likeCount(item.id)
+  const count = await likeCount(videoItem.id)
   if (count.success) {
     likeItem.badge = count.data
   }
 
-  const his = await historyCount(item.id)
+  const his = await historyCount(videoItem.id)
   if (his.success) {
     historyItem.badge = his.data
   }
 
   // 获取视频点赞&收藏状态
-  const resLike = await isLike(item.id)
+  const resLike = await isLike(videoItem.id)
   if (resLike.success) {
     isLikeStatus.value = resLike.data
     if (resLike.data) {
@@ -107,7 +115,7 @@ async function initVideoInfo() {
       likeItem.icon = 'like'
     }
   }
-  const resCollect = await isCollect(item.id)
+  const resCollect = await isCollect(videoItem.id)
   if (resCollect.success) {
     isStarStatus.value = resCollect.data
     if (resCollect.data) {
@@ -150,14 +158,14 @@ function copyId(id: string) {
   // Ts + vue3 将Id复制到剪贴板
   navigator.clipboard.writeText(id).then(() => {
     showToast('ID copied to clipboard')
-  }, (err) => {
-    showToast('Failed to copy text: ', err)
+  }, () => {
+    showToast('Failed to copy text: ')
   })
 }
 
 async function toLike() {
   if (isLikeStatus.value) {
-    const res = await removeLike(item.id)
+    const res = await removeLike(videoItem.id)
     if (res.success) {
       likeItem.iconColor = ''
       likeItem.icon = 'like-o'
@@ -166,7 +174,7 @@ async function toLike() {
     }
   }
   else {
-    const res = await likeDo('video', item.id)
+    const res = await likeDo('video', videoItem.id)
     if (res.success) {
       likeItem.iconColor = '#ee0a0a'
       likeItem.icon = 'like'
@@ -175,9 +183,10 @@ async function toLike() {
     }
   }
 }
+
 async function toStar() {
   if (isStarStatus.value) {
-    const res = await removeCollect(item.id)
+    const res = await removeCollect(videoItem.id)
     if (res.success) {
       starItem.iconColor = ''
       starItem.icon = 'star-o'
@@ -186,7 +195,7 @@ async function toStar() {
     }
   }
   else {
-    const res = await collectDo(item.id)
+    const res = await collectDo(videoItem.id)
     if (res.success) {
       starItem.iconColor = '#eed00a'
       starItem.icon = 'star'
@@ -205,29 +214,38 @@ async function toStar() {
 
     <van-row justify="center">
       <van-col style="text-align: center;" span="5">
-        <van-button style="margin: 7px 0;" size="mini" round type="default" :icon="historyItem.icon" :color="historyItem.iconColor">
+        <van-button
+          style="margin: 7px 0;" size="mini" round type="default" :icon="historyItem.icon"
+          :color="historyItem.iconColor"
+        >
           <van-rolling-text :start-num="0" :target-num="historyItem.badge" />
         </van-button>
       </van-col>
       <van-col style="text-align: center;" span="5" offset="7">
-        <van-button style="margin: 7px 0;" size="mini" round type="default" :icon="likeItem.icon" :color="likeItem.iconColor" @click="toLike">
+        <van-button
+          style="margin: 7px 0;" size="mini" round type="default" :icon="likeItem.icon"
+          :color="likeItem.iconColor" @click="toLike"
+        >
           <van-rolling-text :start-num="0" :target-num="likeItem.badge" />
         </van-button>
       </van-col>
       <van-col style="text-align: center;">
-        <van-button style="margin: 7px 0;" size="mini" round type="default" :icon="starItem.icon" :color="starItem.iconColor" @click="toStar">
+        <van-button
+          style="margin: 7px 0;" size="mini" round type="default" :icon="starItem.icon"
+          :color="starItem.iconColor" @click="toStar"
+        >
           <van-rolling-text :start-num="0" :target-num="starItem.badge" />
         </van-button>
       </van-col>
     </van-row>
     <van-row justify="center">
       <van-col style="margin: 5px 0;" span="20">
-        <van-text-ellipsis :content="item.title" expand-text="展开" collapse-text="收起" />
+        <van-text-ellipsis :content="videoItem.title" expand-text="展开" collapse-text="收起" />
       </van-col>
     </van-row>
 
     <van-cell-group inset style="margin-top: 4px;">
-      <van-cell is-link :title="`ID: ${item.id}`" @click="copyId(item.id)" />
+      <van-cell is-link :title="`ID: ${videoItem.id}`" @click="copyId(videoItem.id)" />
     </van-cell-group>
 
     <van-cell-group inset style="margin-top: 4px;">

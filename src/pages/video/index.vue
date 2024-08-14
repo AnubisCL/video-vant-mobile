@@ -27,20 +27,27 @@ const pageRes = reactive({
 })
 const keyword = ref('')
 const loading = ref(false)
-function onSearch(val) {
+const searchBgColor = ref('rgba(60,99,157,0.94)')
+
+onMounted(() => {
+  nextPage()
+})
+
+// 搜索
+function onSearch(val: any) {
   loading.value = true
   showToast(val)
   pageReq.current = 0
   nextPage()
   loading.value = false
 }
+
+// 取消搜索
 function onCancel() {
   showToast(t('button.cancel'))
 }
 
-onMounted(() => {
-  nextPage()
-})
+// 分页获取视频
 async function nextPage() {
   NProgress.start()
   list.value = []
@@ -117,7 +124,7 @@ const onRefresh = () => {
       v-model="keyword"
       :disabled="loading"
       shape="round"
-      background="rgba(60,99,157,0.94)"
+      :background="searchBgColor"
       placeholder="请输入搜索关键词"
       @search="onSearch"
       @cancel="onCancel"

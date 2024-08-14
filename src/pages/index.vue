@@ -10,32 +10,30 @@ definePage({
   },
 })
 
-const { t } = useI18n()
 const userStore = useUserStore()
-
-const data = reactive({
-  userForm: {
-    account: '',
-    password: '',
-  },
-  loginLoading: false,
+const { t } = useI18n()
+const userForm = reactive({
+  account: '',
+  password: '',
 })
+const loginLoading = ref(false)
 
 onMounted(() => {
-  data.userForm.account = localStorage.get(HISTORY_ACCOUNT)
-  data.userForm.password = localStorage.get(HISTORY_PASSWORD)
+  userForm.account = localStorage.get(HISTORY_ACCOUNT)
+  userForm.password = localStorage.get(HISTORY_PASSWORD)
 })
 
+// 登录
 async function onSubmit() {
-  data.loginLoading = true
-  const isEmail = data.userForm.account.indexOf('@') > 0
-  await userStore.signIn({
-    username: isEmail ? randomUsername() : data.userForm.account,
-    email: isEmail ? data.userForm.account : '',
-    password: data.userForm.password,
+  loginLoading.value = true
+  const isEmail = userForm.account.indexOf('@') > 0
+  await userStore.signInFun({
+    username: isEmail ? randomUsername() : userForm.account,
+    email: isEmail ? userForm.account : '',
+    password: userForm.password,
   })
-  localStorage.set(HISTORY_ACCOUNT, data.userForm.account)
-  data.loginLoading = false
+  localStorage.set(HISTORY_ACCOUNT, userForm.account)
+  loginLoading.value = false
 }
 
 // 生成随机用户名
@@ -50,7 +48,7 @@ function randomUsername() {
     <van-form @submit="onSubmit">
       <van-cell-group inset>
         <van-field
-          v-model="data.userForm.account"
+          v-model="userForm.account"
           left-icon="contact"
           :name="t('edit.account')"
           :label="t('edit.account')"
@@ -58,7 +56,7 @@ function randomUsername() {
           :rules="[{ required: true, message: t('edit.emailOrUsernameMsg') }]"
         />
         <van-field
-          v-model="data.userForm.password"
+          v-model="userForm.password"
           left-icon="closed-eye"
           type="password"
           :name="t('edit.password')"
@@ -68,7 +66,7 @@ function randomUsername() {
         />
       </van-cell-group>
       <div style="margin: 16px;">
-        <van-button round block :loading="data.loginLoading" native-type="submit" type="primary" loading-text="登录中...">
+        <van-button round block :loading="loginLoading" native-type="submit" type="primary" loading-text="登录中...">
           登录
         </van-button>
       </div>

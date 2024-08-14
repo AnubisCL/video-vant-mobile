@@ -15,23 +15,22 @@ definePage({
 const userStore = useUserStore()
 const { t } = useI18n()
 
-const data = reactive({
-  editForm: {
-    username: '',
-    email: '',
-    password: '',
-  },
+const editForm = reactive({
+  username: '',
+  email: '',
+  password: '',
 })
-
-onMounted(() => {
-  data.editForm.username = userStore.user.username
-  data.editForm.email = userStore.user.email
-  getAvatarBase64()
-})
-
 // 用户头像
 const avatar = ref('')
 const avatarLoad = ref(false)
+
+onMounted(() => {
+  editForm.username = userStore.user.username
+  editForm.email = userStore.user.email
+  getAvatarBase64()
+})
+
+// 获取头像
 async function getAvatarBase64() {
   avatarLoad.value = true
   const res = await getAvatar()
@@ -40,8 +39,9 @@ async function getAvatarBase64() {
   }
   avatarLoad.value = false
 }
+
 // 上传完成
-async function afterRead(file) {
+async function afterRead(file: any) {
   const formData = new FormData()
   formData.append('file', file.file)
   // 此时可以自行将文件上传至服务器
@@ -55,6 +55,10 @@ async function afterRead(file) {
   }
 }
 
+async function onSubmit() {
+  // todo：修改个人信息
+}
+
 // const beforeRead = (file) => {
 //   debugger
 //   if (file.type !== 'image/jpeg') {
@@ -63,10 +67,6 @@ async function afterRead(file) {
 //   }
 //   return true;
 // };
-
-async function onSubmit() {
-  // todo：修改个人信息
-}
 </script>
 
 <template>
@@ -93,21 +93,21 @@ async function onSubmit() {
           </template>
         </van-field>
         <van-field
-          v-model="data.editForm.username"
+          v-model="editForm.username"
           :name="t('edit.username')"
           :label="t('edit.username')"
           :placeholder="t('edit.username')"
           :rules="[{ required: true, message: t('edit.usernameMsg') }]"
         />
         <van-field
-          v-model="data.editForm.email"
+          v-model="editForm.email"
           :name="t('edit.email')"
           :label="t('edit.email')"
           :placeholder="t('edit.email')"
           :rules="[{ required: true, message: t('edit.emailMsg') }]"
         />
         <van-field
-          v-model="data.editForm.password"
+          v-model="editForm.password"
           type="password"
           :name="t('edit.password')"
           :label="t('edit.password')"
