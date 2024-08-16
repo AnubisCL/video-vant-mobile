@@ -2,6 +2,8 @@ import { showNotify } from 'vant'
 import { isLogin } from '@/api/auth'
 import router from '@/router'
 
+const { t } = useI18n()
+
 let checkLoginTimer: NodeJS.Timeout | null = null
 export async function startCheckLoginTimer() {
   checkLoginTimer = setInterval(async () => {
@@ -10,7 +12,7 @@ export async function startCheckLoginTimer() {
       if (res.data === 'false') {
         showNotify({
           type: 'danger',
-          message: res.message,
+          message: t('business.isLoginOut'),
         })
         router.replace('/login')
       }
@@ -18,7 +20,7 @@ export async function startCheckLoginTimer() {
     else {
       showNotify({
         type: 'danger',
-        message: '登录状态验证失败',
+        message: t('business.isLoginErr'),
       })
       router.replace('/login')
     }

@@ -68,5 +68,17 @@
   },
   "keepAlive": {
     "label": "The current component will be cached"
+  },
+  "error": {
+    "400": "Interface parameter error",
+    "403": "Access without permission",
+    "404": "The page does not exist",
+    "500": "Server error"
+  },
+  "business": {
+    "loginError": "Login failed",
+    "loginOut": "Log out",
+    "isLoginErr": "Login status is abnormal",
+    "isLoginOut": "Login status expired"
   }
 }

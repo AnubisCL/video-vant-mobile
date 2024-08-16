@@ -4,6 +4,8 @@ import { showNotify } from 'vant'
 import { STORAGE_TOKEN_KEY } from '@/stores/mutation-type'
 import { localStorage } from '@/utils/local-storage'
 import router from '@/router'
+
+const { t } = useI18n()
 // 这里是用于设定请求后端时，所用的 Token KEY
 // 可以根据自己的需要修改，常见的如 Access-Token，Authorization
 // 需要注意的是，请尽量保证使用中横线`-` 来作为分隔符，
@@ -30,7 +32,13 @@ function errorHandler(error: RequestError): AxiosResponse {
     if (status === 500) {
       showNotify({
         type: 'danger',
-        message: error.message,
+        message: t('error.500'),
+      })
+    }
+    if (status === 400) {
+      showNotify({
+        type: 'danger',
+        message: t('error.400'),
       })
     }
     // fixme 其他报错提示处理(重试，幂等，限流，降级，熔断)
@@ -86,7 +94,7 @@ export async function request<T = any>(config: AxiosRequestConfig): Promise<ApiR
         localStorage.set(STORAGE_TOKEN_KEY, '')
         showNotify({
           type: 'danger',
-          message: statusText,
+          message: t('error.403'),
         })
         // 登录失效直接跳转到登录
         router.replace('/login')

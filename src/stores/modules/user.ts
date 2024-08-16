@@ -7,6 +7,8 @@ import { STORAGE_TOKEN_KEY } from '@/stores/mutation-type'
 import router from '@/router'
 import { startCheckLoginTimer, stopCheckLoginTimer } from '@/utils/loginChecker'
 
+const { t } = useI18n()
+
 interface UserState {
   userId: number
   username: string
@@ -70,7 +72,7 @@ const useUserStore = defineStore('user', () => {
     else {
       showNotify({
         type: 'danger',
-        message: res.message,
+        message: t('business.loginError'),
       })
     }
   }
@@ -80,7 +82,7 @@ const useUserStore = defineStore('user', () => {
       localStorage.remove(STORAGE_TOKEN_KEY)
       showNotify({
         type: 'success',
-        message: res.message,
+        message: t('business.loginOut'),
       })
       stopCheckLoginTimer()
     }
@@ -93,7 +95,7 @@ const useUserStore = defineStore('user', () => {
     else {
       showNotify({
         type: 'danger',
-        message: res.message,
+        message: t('business.isLoginOut'),
       })
       return false
     }
