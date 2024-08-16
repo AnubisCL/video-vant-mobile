@@ -14,6 +14,7 @@ interface UserState {
   state: number
   roleId: number
   roleName: string
+  publicKey: string
 }
 
 /**
@@ -30,6 +31,7 @@ const useUserStore = defineStore('user', () => {
     state: 0,
     roleId: 0,
     roleName: '',
+    publicKey: '',
   })
   const permissions = ref([])
   const signInFun = async (userForm: any, signType: string = enums.LOGIN_STATUS.SIGN_IN) => {
@@ -52,6 +54,7 @@ const useUserStore = defineStore('user', () => {
         user.state = resUserInfo.data.state as number
         user.roleId = resUserInfo.data.roleId as number
         user.roleName = resUserInfo.data.roleName as string
+        user.publicKey = resUserInfo.data.publicKey as string
         permissions.value = resUserInfo.data.permissions
       }
       // 3.menu
