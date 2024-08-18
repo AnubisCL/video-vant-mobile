@@ -1,13 +1,12 @@
 import { defineStore } from 'pinia'
 import { showNotify } from 'vant'
+import { useI18n } from 'vue-i18n'
 import enums from '@/utils/enums'
 import { getMenuList, getUserInfo, isLogin, signIn, signOut } from '@/api/auth'
 import { localStorage } from '@/utils/local-storage'
 import { STORAGE_TOKEN_KEY } from '@/stores/mutation-type'
 import router from '@/router'
 import { startCheckLoginTimer, stopCheckLoginTimer } from '@/utils/loginChecker'
-
-const { t } = useI18n()
 
 interface UserState {
   userId: number
@@ -36,6 +35,7 @@ const useUserStore = defineStore('user', () => {
     publicKey: '',
   })
   const permissions = ref([])
+  const { t } = useI18n()
   const signInFun = async (userForm: any, signType: string = enums.LOGIN_STATUS.SIGN_IN) => {
     const loginInfo = {
       username: userForm.username,

@@ -1,11 +1,11 @@
 import type { AxiosError, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
 import axios from 'axios'
 import { showNotify } from 'vant'
+import { useI18n } from 'vue-i18n'
 import { STORAGE_TOKEN_KEY } from '@/stores/mutation-type'
 import { localStorage } from '@/utils/local-storage'
 import router from '@/router'
 
-const { t } = useI18n()
 // 这里是用于设定请求后端时，所用的 Token KEY
 // 可以根据自己的需要修改，常见的如 Access-Token，Authorization
 // 需要注意的是，请尽量保证使用中横线`-` 来作为分隔符，
@@ -26,6 +26,7 @@ export type RequestError = AxiosError<{
 
 // 异常拦截处理器 不管异常还是正常请求统一返回 AxiosResponse
 function errorHandler(error: RequestError): AxiosResponse {
+  const { t } = useI18n()
   if (error.response) {
     const { data = {}, status, statusText } = error.response
     // 500 服务端报错提示
@@ -86,6 +87,7 @@ export interface ApiResponse<T = any> {
 }
 
 export async function request<T = any>(config: AxiosRequestConfig): Promise<ApiResponse<T>> {
+  const { t } = useI18n()
   // then和catch里面返回的数据必须加as const，否则调用方无法推断出类型
   return axiosInstance.request<T>(config)
     .then(({ data, status, statusText }) => {

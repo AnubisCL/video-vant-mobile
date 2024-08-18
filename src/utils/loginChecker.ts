@@ -1,11 +1,11 @@
 import { showNotify } from 'vant'
+import { useI18n } from 'vue-i18n'
 import { isLogin } from '@/api/auth'
 import router from '@/router'
 
-const { t } = useI18n()
-
 let checkLoginTimer: NodeJS.Timeout | null = null
 export async function startCheckLoginTimer() {
+  const { t } = useI18n()
   checkLoginTimer = setInterval(async () => {
     const res = await isLogin()
     if (res.success) {
