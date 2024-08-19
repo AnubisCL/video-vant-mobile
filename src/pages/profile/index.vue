@@ -54,7 +54,6 @@ function onLanguageConfirm(event: { selectedOptions: PickerColumn }) {
 // 退出登录
 async function signOut() {
   await userStore.signOutFun()
-  await router.replace('/login')
 }
 // 获取头像
 async function getAvatarBase64() {

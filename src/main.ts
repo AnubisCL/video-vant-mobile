@@ -33,9 +33,9 @@ const app = createApp(App)
 const head = createHead()
 
 app.use(head) // 挂载head
-app.use(router) // 挂载路由
-app.use(pinia) // 挂载pinia store
 app.use(i18n) // 挂载i18n 国际化
+app.use(pinia) // 挂载pinia store
 app.use(Lazyload) // 挂载懒加载
+app.use(router) // 挂载路由
 
 app.mount('#app')

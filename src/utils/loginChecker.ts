@@ -1,18 +1,17 @@
 import { showNotify } from 'vant'
-import { useI18n } from 'vue-i18n'
 import { isLogin } from '@/api/auth'
 import router from '@/router'
+import { translateMessage } from '@/utils/i18n'
 
 let checkLoginTimer: NodeJS.Timeout | null = null
 export async function startCheckLoginTimer() {
-  const { t } = useI18n()
   checkLoginTimer = setInterval(async () => {
     const res = await isLogin()
     if (res.success) {
       if (res.data === 'false') {
         showNotify({
           type: 'danger',
-          message: t('business.isLoginOut'),
+          message: translateMessage('business.isLoginOut'),
         })
         router.replace('/login')
       }
@@ -20,7 +19,7 @@ export async function startCheckLoginTimer() {
     else {
       showNotify({
         type: 'danger',
-        message: t('business.isLoginErr'),
+        message: translateMessage('business.isLoginErr'),
       })
       router.replace('/login')
     }

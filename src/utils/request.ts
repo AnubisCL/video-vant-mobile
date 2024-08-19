@@ -1,10 +1,10 @@
 import type { AxiosError, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
 import axios from 'axios'
 import { showNotify } from 'vant'
-import { useI18n } from 'vue-i18n'
 import { STORAGE_TOKEN_KEY } from '@/stores/mutation-type'
 import { localStorage } from '@/utils/local-storage'
 import router from '@/router'
+import { translateMessage } from '@/utils/i18n'
 
 // 这里是用于设定请求后端时，所用的 Token KEY
 // 可以根据自己的需要修改，常见的如 Access-Token，Authorization
@@ -26,20 +26,19 @@ export type RequestError = AxiosError<{
 
 // 异常拦截处理器 不管异常还是正常请求统一返回 AxiosResponse
 function errorHandler(error: RequestError): AxiosResponse {
-  const { t } = useI18n()
   if (error.response) {
     const { data = {}, status, statusText } = error.response
     // 500 服务端报错提示
     if (status === 500) {
       showNotify({
         type: 'danger',
-        message: t('error.500'),
+        message: translateMessage('error.500'),
       })
     }
     if (status === 400) {
       showNotify({
         type: 'danger',
-        message: t('error.400'),
+        message: translateMessage('error.400'),
       })
     }
     // fixme 其他报错提示处理(重试，幂等，限流，降级，熔断)
@@ -87,7 +86,6 @@ export interface ApiResponse<T = any> {
 }
 
 export async function request<T = any>(config: AxiosRequestConfig): Promise<ApiResponse<T>> {
-  const { t } = useI18n()
   // then和catch里面返回的数据必须加as const，否则调用方无法推断出类型
   return axiosInstance.request<T>(config)
     .then(({ data, status, statusText }) => {
@@ -96,7 +94,7 @@ export async function request<T = any>(config: AxiosRequestConfig): Promise<ApiR
         localStorage.set(STORAGE_TOKEN_KEY, '')
         showNotify({
           type: 'danger',
-          message: t('error.403'),
+          message: translateMessage('error.403'),
         })
         // 登录失效直接跳转到登录
         router.replace('/login')

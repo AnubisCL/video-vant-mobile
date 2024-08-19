@@ -49,6 +49,12 @@ export const locale = computed({
   },
 })
 
+// 在其他 TypeScript 文件中使用 i18n
+export function translateMessage(messageKey: string) {
+  // 获取全局的 i18n 实例
+  return i18n.global.t(messageKey)
+}
+
 // 载入 vant 语言包
 Locale.use('zh-CN', zhCN)
 Locale.use('en-US', enUS)
