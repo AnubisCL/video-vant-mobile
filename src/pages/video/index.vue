@@ -17,7 +17,7 @@ const { t } = useI18n()
 const list = ref([])
 const pageReq = reactive({
   current: 0,
-  size: 8,
+  size: 10,
   sortBy: '',
   asc: false,
 })
