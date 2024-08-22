@@ -30,8 +30,22 @@ const loading = ref(false)
 const searchBgColor = ref('rgba(60,99,157,0.94)')
 
 onMounted(() => {
+  initPageHis()
   nextPage()
 })
+
+function initPageHis(): void {
+  const hisKeyword = localStorage.getItem('vide-keyword')
+  const hisPageReq = JSON.parse(localStorage.getItem('vide-pageReq'))
+  const hisPageRes = JSON.parse(localStorage.getItem('vide-pageRes'))
+  keyword.value = hisKeyword
+  pageReq.current = hisPageReq.current
+  pageReq.size = hisPageReq.size
+  pageReq.sortBy = hisPageReq.sortBy
+  pageReq.asc = hisPageReq.asc
+  pageRes.pages = hisPageRes.pages
+  pageRes.total = hisPageRes.total
+}
 
 // 搜索
 function onSearch(val: any) {
@@ -67,6 +81,9 @@ async function nextPage() {
     else {
       showToast(t('video.noMore'))
     }
+    localStorage.setItem('vide-keyword', keyword.value)
+    localStorage.setItem('vide-pageReq', JSON.stringify(pageReq))
+    localStorage.setItem('vide-pageRes', JSON.stringify(pageRes))
   }
   else {
     showToast(t('video.error'))
