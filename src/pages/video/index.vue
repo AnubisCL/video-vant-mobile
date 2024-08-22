@@ -38,18 +38,20 @@ function initPageHis(): void {
   const hisKeyword = localStorage.getItem('vide-keyword')
   const hisPageReq = JSON.parse(localStorage.getItem('vide-pageReq'))
   const hisPageRes = JSON.parse(localStorage.getItem('vide-pageRes'))
-  if (hisKeyword !== keyword.value) {
-    keyword.value = hisKeyword
-  }
-  if (pageReq.current !== hisPageReq.current) {
-    pageReq.current = hisPageReq.current
-    pageReq.size = hisPageReq.size
-    pageReq.sortBy = hisPageReq.sortBy
-    pageReq.asc = hisPageReq.asc
-  }
-  if (pageRes.pages !== hisPageRes.pages) {
-    pageRes.pages = hisPageRes.pages
-    pageRes.total = hisPageRes.total
+  if (hisPageReq !== null && hisPageRes !== null && hisKeyword !== null) {
+    if (hisKeyword !== keyword.value) {
+      keyword.value = hisKeyword
+    }
+    if (pageReq.current !== hisPageReq.current) {
+      pageReq.current = hisPageReq.current
+      pageReq.size = hisPageReq.size
+      pageReq.sortBy = hisPageReq.sortBy
+      pageReq.asc = hisPageReq.asc
+    }
+    if (pageRes.pages !== hisPageRes.pages) {
+      pageRes.pages = hisPageRes.pages
+      pageRes.total = hisPageRes.total
+    }
   }
 }
 
