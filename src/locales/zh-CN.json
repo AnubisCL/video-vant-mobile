@@ -1,7 +1,7 @@
 {
   "home": {
     "video": "\uD83C\uDFA5 视频",
-    "menu": "🍜 点餐",
+    "menu": "\uD83D\uDC97 阿呀卓卓的专属食堂",
     "mockGuide": "Mock 指南",
     "echartsDemo": "Echarts 演示",
     "persistPiniaState": "持久化 Pinia 状态",

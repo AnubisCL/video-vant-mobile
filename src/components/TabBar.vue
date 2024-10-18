@@ -13,13 +13,9 @@ const tabBarList = ref([])
 const route = useRoute()
 
 // 监听 options 变化
-watch(
-  () => props.tabBarList,
-  (newOptions: any) => {
-    tabBarList.value = newOptions
-  },
-  { immediate: true, deep: true }, // 立即执行一次以初始化
-)
+watch(() => props.tabBarList, (newOptions: any) => {
+  tabBarList.value = newOptions
+}, { immediate: true, deep: true }) // 立即执行一次以初始化
 const { t } = useI18n()
 
 // 计算属性 display 用于决定是否显示 tabbar
