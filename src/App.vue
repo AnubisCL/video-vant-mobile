@@ -4,6 +4,7 @@ import useAppStore from '@/stores/modules/app'
 import useRouteCache from '@/stores/modules/routeCache'
 import useRouteTransitionNameStore from '@/stores/modules/routeTransitionName'
 import useAutoThemeSwitcher from '@/hooks/useAutoThemeSwitcher'
+import useUserStore from '@/stores/modules/user'
 
 // 设置页面头部信息，包括标题、元数据和链接 SEO
 useHead({
@@ -31,6 +32,8 @@ useHead({
 const appStore = useAppStore()
 // storeToRefs 将 pinia 中的 store 对象中的状态转换为具有 .value 的 ref 对象集合
 const { mode } = storeToRefs(appStore)
+
+const userStore = useUserStore()
 
 // 使用routeTransitionNameStore状态
 const routeTransitionNameStore = useRouteTransitionNameStore()
@@ -70,7 +73,7 @@ onMounted(() => {
         </keepAlive>
       </transition>
     </router-view>
-    <!--    -->
-    <TabBar />
+    <!-- 绑定 userStore.tabBarList -->
+    <TabBar :tab-bar-list="userStore.tabBarList" />
   </VanConfigProvider>
 </template>

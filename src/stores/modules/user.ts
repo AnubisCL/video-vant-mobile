@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { showNotify } from 'vant'
 import enums from '@/utils/enums'
-import { getUserInfo, isLogin, signIn, signOut } from '@/api/auth'
+import { getMenuList, getUserInfo, isLogin, signIn, signOut } from '@/api/auth'
 import { localStorage } from '@/utils/local-storage'
 import { STORAGE_TOKEN_KEY } from '@/stores/mutation-type'
 import router from '@/router'
@@ -35,6 +35,7 @@ const useUserStore = defineStore('user', () => {
     publicKey: '',
   })
   const permissions = ref([])
+  const tabBarList = ref([])
   const signInFun = async (userForm: any, signType: string = enums.LOGIN_STATUS.SIGN_IN) => {
     const loginInfo = {
       username: userForm.username,
@@ -57,6 +58,11 @@ const useUserStore = defineStore('user', () => {
         user.roleName = resUserInfo.data.roleName as string
         user.publicKey = resUserInfo.data.publicKey as string
         permissions.value = resUserInfo.data.permissions
+      }
+      const resMenu = await getMenuList('tabBar')
+      if (resMenu.success) {
+        // tabBar 菜单Router控制
+        tabBarList.value = resMenu.data
       }
       await startCheckLoginTimer()
       await router.push('/profile')
@@ -99,6 +105,7 @@ const useUserStore = defineStore('user', () => {
   return {
     user,
     permissions,
+    tabBarList,
     signInFun,
     signOutFun,
     isLoginFun,

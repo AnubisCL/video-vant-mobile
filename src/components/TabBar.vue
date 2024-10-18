@@ -1,16 +1,26 @@
  template
 <script setup lang="ts">
-// 使用 useI18n 函数来获取国际化操作方法
-import { getMenuList } from '@/api/auth'
-
-const { t } = useI18n()
-
-// 初始化激活的标签页索引
+const props = defineProps({
+  tabBarList: {
+    type: Object,
+    default: () => ({}),
+  },
+})
 const active = ref(0)
 const tabBarList = ref([])
 
 // 使用 useRoute 函数来获取当前路由信息
 const route = useRoute()
+
+// 监听 options 变化
+watch(
+  () => props.tabBarList,
+  (newOptions: any) => {
+    tabBarList.value = newOptions
+  },
+  { immediate: true, deep: true }, // 立即执行一次以初始化
+)
+const { t } = useI18n()
 
 // 计算属性 display 用于决定是否显示 tabbar
 // 根据路由的 meta 信息中的 level 来决定是否显示，仅在 level 不为 2 时显示
@@ -19,19 +29,6 @@ const display = computed(() => {
     return true
   return false
 })
-
-onMounted(() => {
-  // 初始化tabBar
-  initTabBar()
-})
-
-async function initTabBar() {
-  const resMenu = await getMenuList('tabBar')
-  if (resMenu.success) {
-    // tabBar 菜单Router控制
-    tabBarList.value = resMenu.data
-  }
-}
 </script>
 
 <template>

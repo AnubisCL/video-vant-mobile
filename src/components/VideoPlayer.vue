@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { defineProps, onUnmounted, ref } from 'vue'
+import { onUnmounted, ref } from 'vue'
 import videoJs from 'video.js'
 
 const props = defineProps({
