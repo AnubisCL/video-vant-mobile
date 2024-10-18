@@ -101,32 +101,42 @@ async function getAvatarBase64() {
             </van-tag>
           </van-space>
         </template>
-        <template #right-icon>
+        <template v-if="userStore.checkPermissions('profile.edit')" #right-icon>
           <van-icon name="setting-o" class="search-icon" @click="router.push('/profile/edit')" />
         </template>
       </van-cell>
-      <van-cell center :title="t('profile.darkMode')">
+      <van-cell v-if="userStore.checkPermissions('profile.dark')" center :title="t('profile.darkMode')">
         <template #right-icon>
           <VanSwitch v-model="checked" size="20px" aria-label="on/off Dark Mode" @click="toggle()" />
         </template>
       </van-cell>
       <van-cell
+        v-if="userStore.checkPermissions('profile.language')"
         is-link
         :title="t('profile.language')"
         :value="language"
         @click="showLanguagePicker = true"
       />
-      <van-cell is-link :title="t('profile.collector')" @click="router.push('/profile/star')">
+      <van-cell
+        v-if="userStore.checkPermissions('profile.star')"
+        is-link :title="t('profile.collector')" @click="router.push('/profile/star')"
+      >
         <template #right-icon>
           <van-icon name="star-o" class="search-icon" />
         </template>
       </van-cell>
-      <van-cell is-link :title="t('profile.history')" @click="router.push('/profile/history')">
+      <van-cell
+        v-if="userStore.checkPermissions('profile.history')"
+        is-link :title="t('profile.history')" @click="router.push('/profile/history')"
+      >
         <template #right-icon>
           <van-icon name="browsing-history-o" class="search-icon" />
         </template>
       </van-cell>
-      <van-cell is-link :title="t('profile.signOut')" @click="signOut">
+      <van-cell
+        v-if="userStore.checkPermissions('profile.logout')"
+        is-link :title="t('profile.signOut')" @click="signOut"
+      >
         <template #right-icon>
           <van-icon name="down" class="search-icon" />
         </template>

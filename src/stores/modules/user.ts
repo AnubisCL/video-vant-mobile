@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { showNotify } from 'vant'
 import enums from '@/utils/enums'
-import { getMenuList, getUserInfo, isLogin, signIn, signOut } from '@/api/auth'
+import { getUserInfo, isLogin, signIn, signOut } from '@/api/auth'
 import { localStorage } from '@/utils/local-storage'
 import { STORAGE_TOKEN_KEY } from '@/stores/mutation-type'
 import router from '@/router'
@@ -58,13 +58,6 @@ const useUserStore = defineStore('user', () => {
         user.publicKey = resUserInfo.data.publicKey as string
         permissions.value = resUserInfo.data.permissions
       }
-      // 3.menu
-      const resMenu = await getMenuList()
-      if (resMenu.success) {
-        // fixme：菜单Router控制
-        // 实现动态路由更新逻辑
-        // 可以在这里根据返回的菜单数据动态生成路由
-      }
       await startCheckLoginTimer()
       await router.push('/profile')
     }
@@ -100,12 +93,16 @@ const useUserStore = defineStore('user', () => {
       return false
     }
   }
+  const checkPermissions = (permission: string) => {
+    return permissions.value.includes(permission)
+  }
   return {
     user,
     permissions,
     signInFun,
     signOutFun,
     isLoginFun,
+    checkPermissions,
   }
 }, {
   persist: true,

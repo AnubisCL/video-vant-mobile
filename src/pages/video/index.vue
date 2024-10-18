@@ -8,8 +8,9 @@ import router from '@/router'
 definePage({
   name: 'video',
   meta: {
-    level: 1,
-    keepAlive: true,
+    level: 2,
+    title: '视频',
+    i18n: 'home.video',
   },
 })
 
@@ -143,7 +144,7 @@ const onRefresh = () => {
 </script>
 
 <template>
-  <Container :padding-x="0" :padding-t="0" :padding-b="100">
+  <Container :padding-x="0" :padding-b="0">
     <van-search
       v-model="keyword"
       :disabled="loading"
@@ -154,13 +155,13 @@ const onRefresh = () => {
       @cancel="onCancel"
     />
     <van-grid :border="false" :column-num="2" :gutter="3">
-      <van-grid-item v-for="item in list" :key="item.videoId" :title="item.title">
+      <van-grid-item v-for="item in list" :key="item.videoId" :text="item.title">
         <van-image
           lazy-load
           :src="item.imageUrl"
           fit="cover"
-          width="100%"
-          height="100%"
+          width="10rem"
+          height="7rem"
           @click="router.push({ path: '/video/info',
                                 query: {
                                   videoId: item.videoId,
@@ -173,10 +174,14 @@ const onRefresh = () => {
             <van-loading type="spinner" size="20" />
           </template>
         </van-image>
+        <van-row justify="center" style="margin-top: 10px;">
+          <span>{{ item.title }}</span>
+        </van-row>
       </van-grid-item>
     </van-grid>
     <van-pagination
       v-model="pageReq.current"
+      style="margin: 10px 0;"
       :items-per-page="pageReq.size"
       :total-items="pageRes.total"
       :page-count="pageRes.pages"

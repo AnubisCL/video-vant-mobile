@@ -1,11 +1,13 @@
 {
   "home": {
-    "mockGuide": "💿 Mock Guide",
-    "404Demo": "🙅 Page 404 Demo",
-    "echartsDemo": "📊 Echarts Demo",
-    "persistPiniaState": "🍍 Persistent Pinia state",
-    "unocssExample": "🎨 Unocss example",
-    "keepAlive": "🧡 KeepAlive Demo"
+    "video": "\uD83C\uDFA5 Video",
+    "menu": "🍜 Menu",
+    "mockGuide": "Mock Guide",
+    "404Demo": "Page 404 Demo",
+    "echartsDemo": "Echarts Demo",
+    "persistPiniaState": "Persistent Pinia state",
+    "unocssExample": "Unocss example",
+    "keepAlive": "KeepAlive Demo"
   },
   "mock": {
     "fromAsyncData": "Data from asynchronous requests",

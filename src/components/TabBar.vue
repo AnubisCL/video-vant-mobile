@@ -1,10 +1,13 @@
  template
 <script setup lang="ts">
 // 使用 useI18n 函数来获取国际化操作方法
+import { getMenuList } from '@/api/auth'
+
 const { t } = useI18n()
 
 // 初始化激活的标签页索引
 const active = ref(0)
+const tabBarList = ref([])
 
 // 使用 useRoute 函数来获取当前路由信息
 const route = useRoute()
@@ -16,6 +19,19 @@ const display = computed(() => {
     return true
   return false
 })
+
+onMounted(() => {
+  // 初始化tabBar
+  initTabBar()
+})
+
+async function initTabBar() {
+  const resMenu = await getMenuList('tabBar')
+  if (resMenu.success) {
+    // tabBar 菜单Router控制
+    tabBarList.value = resMenu.data
+  }
+}
 </script>
 
 <template>
@@ -23,27 +39,10 @@ const display = computed(() => {
   <van-tabbar v-show="display" v-model="active" route>
     <!-- 首页标签项，通过 to 属性指定跳转路径，使用 replace 属性以替换历史记录的方式跳转 -->
     <!-- 使用 t 方法来获取国际化后的标签文本 -->
-    <van-tabbar-item replace to="/home">
-      {{ t('layouts.home') }}
-      <!-- 自定义首页图标的显示方式 -->
+    <van-tabbar-item v-for="item in tabBarList" :key="item.menuPath" replace :to="item.menuPath">
+      {{ t(item.menuTitle) }}
       <template #icon>
-        <van-icon name="home-o" />
-      </template>
-    </van-tabbar-item>
-    <van-tabbar-item replace to="/video">
-      {{ t('layouts.video') }}
-      <!-- 自定义个人资料图标的显示方式 -->
-      <template #icon>
-        <van-icon name="video-o" />
-      </template>
-    </van-tabbar-item>
-    <!-- 个人资料标签项，同样使用 replace 和 to 属性来指定跳转行为和路径 -->
-    <!-- 使用 t 方法来获取国际化后的标签文本 -->
-    <van-tabbar-item replace to="/profile">
-      {{ t('layouts.profile') }}
-      <!-- 自定义个人资料图标的显示方式 -->
-      <template #icon>
-        <van-icon name="user-o" />
+        <van-icon :name="item.menuIcon" />
       </template>
     </van-tabbar-item>
   </van-tabbar>

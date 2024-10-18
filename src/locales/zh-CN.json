@@ -1,11 +1,13 @@
 {
   "home": {
-    "mockGuide": "💿 Mock 指南",
-    "echartsDemo": "📊 Echarts 演示",
-    "persistPiniaState": "🍍 持久化 Pinia 状态",
-    "404Demo": "🙅 404页 演示",
-    "unocssExample": "🎨 Unocss 示例",
-    "keepAlive": "🧡 KeepAlive 演示"
+    "video": "\uD83C\uDFA5 视频",
+    "menu": "🍜 点餐",
+    "mockGuide": "Mock 指南",
+    "echartsDemo": "Echarts 演示",
+    "persistPiniaState": "持久化 Pinia 状态",
+    "404Demo": "404页 演示",
+    "unocssExample": "Unocss 示例",
+    "keepAlive": "KeepAlive 演示"
   },
   "mock": {
     "fromAsyncData": "来自异步请求的数据",

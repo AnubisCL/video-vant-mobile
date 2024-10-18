@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { getMenuList } from '@/api/auth'
+
 definePage({
   name: 'home',
   meta: {
@@ -7,15 +9,25 @@ definePage({
 })
 
 const { t } = useI18n()
+const menuItems = ref([])
 
-const menuItems = computed(() => ([
-  { title: t('home.mockGuide'), route: 'mock' },
-  { title: t('home.echartsDemo'), route: 'charts' },
-  { title: t('home.unocssExample'), route: 'unocss' },
-  { title: t('home.persistPiniaState'), route: 'counter' },
-  { title: t('home.404Demo'), route: 'unknown' },
-  { title: t('home.keepAlive'), route: 'keepalive' },
-]))
+onMounted(() => {
+  initMenuList()
+})
+
+async function initMenuList() {
+  const resMenu = await getMenuList('page')
+  if (resMenu.success) {
+    // cell 菜单Router控制
+    const menuList = resMenu.data
+    // 转换菜单数据
+    menuItems.value = menuList.map(e => ({
+      title: t(e.menuTitle),
+      route: e.menuPath,
+      icon: e.menuIcon,
+    }))
+  }
+}
 </script>
 
 <template>

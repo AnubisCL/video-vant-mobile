@@ -27,6 +27,6 @@ export function getPermissionList(params?: any, data?: any) {
   return request({ url: '/authentication/getPermissionList', method: 'get', params, data })
 }
 
-export function getMenuList(params?: any, data?: any) {
-  return request({ url: '/authentication/getMenuList', method: 'get', params, data })
+export function getMenuList(menuType: string) {
+  return request({ url: `/authentication/getMenuList/${menuType}`, method: 'get' })
 }

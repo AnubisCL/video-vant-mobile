@@ -9,9 +9,6 @@ declare module 'vue-router/auto-routes' {
   import type {
     RouteRecordInfo,
     ParamValue,
-    ParamValueOneOrMore,
-    ParamValueZeroOrMore,
-    ParamValueZeroOrOne,
   } from 'vue-router'
 
   /**
@@ -24,6 +21,7 @@ declare module 'vue-router/auto-routes' {
     'counter': RouteRecordInfo<'counter', '/counter', Record<never, never>, Record<never, never>>,
     'home': RouteRecordInfo<'home', '/home', Record<never, never>, Record<never, never>>,
     'KeepAlive': RouteRecordInfo<'KeepAlive', '/keepalive', Record<never, never>, Record<never, never>>,
+    'menu': RouteRecordInfo<'menu', '/menu', Record<never, never>, Record<never, never>>,
     'mock': RouteRecordInfo<'mock', '/mock', Record<never, never>, Record<never, never>>,
     'profile': RouteRecordInfo<'profile', '/profile', Record<never, never>, Record<never, never>>,
     'edit': RouteRecordInfo<'edit', '/profile/edit', Record<never, never>, Record<never, never>>,
