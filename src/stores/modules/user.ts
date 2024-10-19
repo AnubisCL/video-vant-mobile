@@ -50,7 +50,7 @@ const useUserStore = defineStore('user', () => {
       // 2.setUserInfo
       const resUserInfo = await getUserInfo()
       if (resUserInfo.success) {
-        user.userId = resUserInfo.data.id as number
+        user.userId = resUserInfo.data.userId as number
         user.username = resUserInfo.data.username as string
         user.email = resUserInfo.data.email as string
         user.state = resUserInfo.data.state as number

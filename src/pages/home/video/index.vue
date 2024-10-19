@@ -160,7 +160,7 @@ const onRefresh = () => {
           lazy-load
           :src="item.imageUrl"
           fit="cover"
-          width="10rem"
+          width="9rem"
           height="7rem"
           @click="router.push({ path: '/video/info',
                                 query: {
