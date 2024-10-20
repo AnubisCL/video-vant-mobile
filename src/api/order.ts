@@ -15,3 +15,7 @@ export function orderItem(params?: any) {
 export function confirm(orderId: number) {
   return request({ url: `/order/confirm/${orderId}`, method: 'get' })
 }
+
+export function getOrderDetailInfo(userId: number) {
+  return request({ url: `/order/getOrderDetailInfo/${userId}`, method: 'get' })
+}

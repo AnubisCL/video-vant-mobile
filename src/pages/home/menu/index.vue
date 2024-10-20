@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { showToast } from 'vant'
 import { ref } from 'vue'
-import { getProductCategory, getProductList } from '@/api/product'
-import { clearCartHisInfo, confirm, getCartHisInfo, orderItem } from '@/api/order'
+import { getProductCategory, getProductDetail, getProductList, updateProductInfo } from '@/api/product'
+import { clearCartHisInfo, confirm, getCartHisInfo, getOrderDetailInfo, orderItem } from '@/api/order'
 import useUserStore from '@/stores/modules/user'
+import { formatDate } from '@/utils/timeUtil'
 
 definePage({
   name: 'menu',
@@ -13,101 +14,63 @@ definePage({
     i18n: 'home.menu',
   },
 })
-// const { t } = useI18n()
+// todo 国际化 const { t } = useI18n()
 const userStore = useUserStore()
 
-const collType = ref(['1'])
-const showCartBottom = ref(false)
-const showCardBottom = ref(false)
-const showOrderBottom = ref(false)
-const showEchartBottom = ref(false)
-// const checkedAllCart = ref(false);
-const activeSidebar = ref(0)
-const cartSize = ref(0)
-const currentOrderId = ref(0)
-
-// need init data
-const sidebarItem: any = ref([])
-const indexBarList: any = ref([])
+// 菜单页面
+const leftSidebarItem = ref([])
+const activeLeftSidebarIndex = ref(0)
+const indexBarList = ref([])
 const productIdItemList = ref([])
-const cartItemList = ref([])
-const cardPropsDetail = reactive({ title: '' })
-
-onMounted(() => {
-  initMenuInfo()
-})
-
-async function initMenuInfo() {
-  // 菜单分类
-  const pcRes = await getProductCategory()
-  if (pcRes.success) {
-    sidebarItem.value = pcRes.data.map((item) => {
-      return {
-        id: item.categoryId,
-        title: item.categoryName,
-        badge: 0,
-        isDisable: false,
-      }
-    })
-    indexBarList.value = sidebarItem.value.map(e => e.title)
-  }
-  // 菜单列表
-  const menuRes = await getProductList()
-  if (menuRes.success) {
-    productIdItemList.value = menuRes.data
-  }
-  // 获取上次选择的购物车信息
-  await updateCartInfo()
-  // todo 获取之前的订单信息
-  // todo 获取统计信息
-}
-
-async function updateCartInfo() {
-  const cartRes = await getCartHisInfo(userStore.user.userId)
-  if (cartRes.success) {
-    cartItemList.value = cartRes.data.cartItemList
-    currentOrderId.value = cartRes.data.currentOrderId
-    // 左侧边栏 标识 菜单列表 标识 购物车badge
-    updateIndexBarBadgeAndProductIdItemTag()
-    cartSize.value = cartItemList.value.length
-  }
-}
-
+const cartIconSize = ref(0)
+const currentOrderId = ref(0) // 当前页面订单Id
 // InstanceType<typeof import('vant').IndexBar>：这部分是用来获取 van-index-bar 组件实例的类型。
 // typeof import('vant').IndexBar：导入 van-index-bar 组件的类型。
 // InstanceType：这是一个 TypeScript 的工具类型，用于从类或构造函数类型中提取实例类型。
 const indexBar = ref<InstanceType<typeof import('vant').IndexBar> | null>(null)
-
-function sidebarChange(index: number) {
-  if (indexBar.value) {
-    // 定位到List的索引
-    indexBar.value.scrollTo(sidebarItem.value[index].title)
-  }
-}
-
-function indexAnchorChange(index: number) {
-  // 定位到左侧边栏的索引
-  activeSidebar.value = indexBarList.value.indexOf(`${index}`)
-}
-
-async function clearCart() {
-  const res = await clearCartHisInfo(userStore.user.userId)
-  if (res.success) {
-    await initMenuInfo()
-    showCartBottom.value = false
-  }
-}
-
+// 历史订单详情
+const hisOrderCollType = ref(['1'])
+const showHisOrderBottom = ref(false)
+const hisOrderDetailInfoList = ref([])
+const hisOrderStateMap: Map<string, any> = new Map()
+hisOrderStateMap.set('WAITING_CONFIRM', { id: 0, tag: '选择菜品', type: 'primary' })
+hisOrderStateMap.set('WAITING_COMPLETED', { id: 1, tag: '提交订单', type: 'success' })
+hisOrderStateMap.set('COMPLETED', { id: 2, tag: '制作订单', type: 'danger' })
+hisOrderStateMap.set('FAILED', { id: 3, tag: '完成订单', type: 'warning' })
+// 统计信息
+const showEChartBottom = ref(false)
+// 购物车
+const showCartBottom = ref(false)
+const cartItemList = ref([])
 const cartTotalPrice = computed(() => {
   return cartItemList.value.reduce((acc, cur) => acc + cur.price * cur.stock, 0)
 })
+// 商品详情
+const showProductCardBottom = ref(false)
+const showProductStatusPicker = ref(false)
+const categoryColumns = ref([])
+const productCardCategory = ref('')
+const productCardDetail = ref({})
 
-// todo 左侧边栏 标识 菜单列表 标识
+/** --- 菜单页面 start --- */
+function leftSidebarChange(index: number) {
+  if (indexBar.value) {
+    // 定位到List的索引
+    indexBar.value.scrollTo(leftSidebarItem.value[index].title)
+  }
+}
+
+function indexBarChange(index: number) {
+  // 定位到左侧边栏的索引
+  activeLeftSidebarIndex.value = indexBarList.value.indexOf(`${index}`)
+}
+
+// 左侧边栏 标识 菜单列表 标识
 function updateIndexBarBadgeAndProductIdItemTag() {
   // 创建一个 Map 来存储产品 ID 和对应的库存
   const productMap: Map<number, any> = new Map()
   cartItemList.value.forEach((item) => {
-    sidebarItem.value.find(sidber => sidber.id === item.categoryId).badge = item.stock
+    leftSidebarItem.value.find(sidber => sidber.id === item.categoryId).badge = item.stock
     // 遍历 cartItemList 并填充 productMap
     productMap.set(item.productId, item.stock)
   })
@@ -122,8 +85,47 @@ function updateIndexBarBadgeAndProductIdItemTag() {
     })
   })
 }
+// 显示商品详情
+async function showProductCardDetail(idx1: number, idx2: any) {
+  // 显示商品详情
+  const product = productIdItemList.value[idx1].cardList[idx2]
+  const productDetailRes = await getProductDetail(product.productDetailId)
+  if (productDetailRes.success) {
+    showProductCardBottom.value = true
+    productCardDetail.value = {
+      product,
+      productDetail: productDetailRes.data,
+    }
+    categoryColumns.value.forEach((colum) => {
+      if (colum.value === product.categoryId) {
+        productCardCategory.value = colum.text
+      }
+    })
+  }
+}
+/** --- 菜单页面 end --- */
 
-async function addCart(idx1: number, idx2: number) {
+/** --- 购物车 start --- */
+async function updateCartInfo() {
+  const cartRes = await getCartHisInfo(userStore.user.userId)
+  if (cartRes.success) {
+    cartItemList.value = cartRes.data.cartItemList
+    currentOrderId.value = cartRes.data.currentOrderId
+    // 左侧边栏 标识 菜单列表 标识 购物车badge
+    updateIndexBarBadgeAndProductIdItemTag()
+    cartIconSize.value = cartItemList.value.length
+  }
+}
+
+async function clearCart() {
+  const res = await clearCartHisInfo(userStore.user.userId)
+  if (res.success) {
+    await initMenuInfo()
+    showCartBottom.value = false
+  }
+}
+
+async function addCart(idx1: number, idx2: any) {
   const product = productIdItemList.value[idx1].cardList[idx2]
   const productId = product.productId
   const res = await orderItem({
@@ -134,7 +136,7 @@ async function addCart(idx1: number, idx2: number) {
   })
   if (res.success) {
     showToast('添加到购物车成功')
-    sidebarItem.value[idx1].badge++
+    leftSidebarItem.value[idx1].badge++
     productIdItemList.value[idx1].cardList[idx2].stock++
     productIdItemList.value[idx1].cardList[idx2].tag = '已选择'
     await updateCartInfo()
@@ -144,24 +146,27 @@ async function addCart(idx1: number, idx2: number) {
   }
 }
 
-async function subCart(idx1: number, idx2: number) {
-  const stock = productIdItemList.value[idx1].cardList[idx2].stock
-  if (stock === 1) {
-    cartSize.value--
-    sidebarItem.value[idx1].badge--
-    productIdItemList.value[idx1].cardList[idx2].stock--
+async function subCart(idx1: number, idx2: any) {
+  const product = productIdItemList.value[idx1].cardList[idx2]
+  const productId = product.productId
+  const res = await orderItem({
+    type: 'sub',
+    productId,
+    userId: userStore.user.userId,
+    orderId: currentOrderId.value,
+  })
+  if (res.success) {
+    leftSidebarItem.value[idx1].badge--
+    const stock = productIdItemList.value[idx1].cardList[idx2].stock
+    if (stock !== 0) {
+      productIdItemList.value[idx1].cardList[idx2].stock--
+    }
     productIdItemList.value[idx1].cardList[idx2].tag = ''
     await updateCartInfo()
   }
   else {
     showToast('请勿重复删除')
   }
-}
-
-function showCardDetail(idx1: number, idx2: number) {
-  // todo 显示商品详情
-  showCardBottom.value = true
-  cardPropsDetail.title = productIdItemList.value[idx1].cardList[idx2].title
 }
 
 async function onSubmitCart() {
@@ -172,6 +177,87 @@ async function onSubmitCart() {
     showCartBottom.value = false
   }
 }
+/** --- 购物车 end --- */
+
+/** --- 商品详情 start --- */
+function onConfirmCategory({ selectedOptions }) {
+  productCardCategory.value = selectedOptions[0]?.text
+  productCardDetail.value.product.categoryId = selectedOptions[0]?.value
+  showProductStatusPicker.value = false
+}
+
+async function onUpdateProductDetail() {
+  const product = productCardDetail.value.product
+  const res = await updateProductInfo({}, product)
+  if (res.success) {
+    showToast('商品信息更新成功')
+  }
+  await initMenuInfo()
+  showProductCardBottom.value = false
+}
+// todo 上传菜品图片
+const avatarLoad = ref(false)
+// 上传完成
+async function afterRead(file: any) {
+  const formData = new FormData()
+  formData.append('file', file.file)
+  // 此时可以自行将文件上传至服务器
+  // const res = await uploadAvatar({}, formData)
+  // if (res.success) {
+  // await getAvatarBase64()
+  //   showToast('上传成功')
+  // }
+  // else {
+  //   showToast('上传失败')
+  // }
+}
+/** --- 商品详情 end --- */
+
+/** --- 历史订单详情 start --- */
+
+/** --- 历史订单详情 end --- */
+
+/** --- 统计信息 start --- */
+
+/** --- 统计信息 end --- */
+// 初始化页面
+onMounted(() => {
+  initMenuInfo()
+})
+async function initMenuInfo() {
+  // 菜单分类
+  const pcRes = await getProductCategory()
+  if (pcRes.success) {
+    leftSidebarItem.value = pcRes.data.map((item) => {
+      return {
+        id: item.categoryId,
+        title: item.categoryName,
+        badge: 0,
+        isDisable: false,
+      }
+    })
+    categoryColumns.value = leftSidebarItem.value.map((e) => {
+      return {
+        text: e.title,
+        value: e.id,
+      }
+    })
+    indexBarList.value = leftSidebarItem.value.map(e => e.title)
+  }
+  // 菜单列表
+  const menuRes = await getProductList()
+  if (menuRes.success) {
+    productIdItemList.value = menuRes.data
+  }
+  // 获取上次选择的购物车信息
+  await updateCartInfo()
+  // 获取之前的订单信息
+  const orderDetailRes = await getOrderDetailInfo(userStore.user.userId)
+  if (orderDetailRes.success) {
+    hisOrderDetailInfoList.value = orderDetailRes.data
+  }
+  // todo 获取统计信息
+}
 </script>
 
 <template>
@@ -179,9 +265,9 @@ async function onSubmitCart() {
     <van-row>
       <van-col span="4">
         <van-sticky :offset-top="46">
-          <van-sidebar v-model="activeSidebar" @change="sidebarChange">
+          <van-sidebar v-model="activeLeftSidebarIndex" @change="leftSidebarChange">
             <van-sidebar-item
-              v-for="(item, index) in sidebarItem" :key="index" :title="item.title" :dot="item.badge > 0"
+              v-for="(item, index) in leftSidebarItem" :key="index" :title="item.title" :dot="item.badge > 0"
               :disabled="item.isDisable"
             />
           </van-sidebar>
@@ -190,7 +276,7 @@ async function onSubmitCart() {
       <van-col span="18" offset="2">
         <van-index-bar
           ref="indexBar" z-index="-1" :sticky-offset-top="46" :index-list="indexBarList"
-          @change="indexAnchorChange"
+          @change="indexBarChange"
         >
           <div v-for="(item, idx1) in productIdItemList" :key="idx1">
             <van-index-anchor :index="item.index" />
@@ -202,7 +288,7 @@ async function onSubmitCart() {
               :desc="card.description"
               :title="card.title"
               :thumb="card.thumb"
-              @click-thumb="showCardDetail(idx1, idx2)"
+              @click-thumb="showProductCardDetail(idx1, idx2)"
             >
               <template #tags>
                 <!--                <van-tag style="margin: 0 3px;" color="#7232dd" v-for="tag in card.tags" plain :type="tag.type">{{ tag.text }}</van-tag> -->
@@ -226,11 +312,11 @@ async function onSubmitCart() {
     <!-- 底部按钮 -->
     <van-action-bar>
       <van-action-bar-icon
-        icon="cart-o" text="购物车" style="margin-right: 70px; padding-left: 10px;" :badge="cartSize"
+        icon="cart-o" text="购物车" style="margin-right: 70px; padding-left: 10px;" :badge="cartIconSize"
         @click="showCartBottom = true"
       />
-      <van-action-bar-button color="#7232dd" type="warning" text="查看订单" @click="showOrderBottom = true" />
-      <van-action-bar-button color="#8F6EBA" type="warning" text="统计信息" @click="showEchartBottom = true" />
+      <van-action-bar-button color="#7232dd" type="warning" text="查看订单" @click="showHisOrderBottom = true" />
+      <van-action-bar-button color="#8F6EBA" type="warning" text="统计信息" @click="showEChartBottom = true" />
       <van-action-bar-button color="#be99ff" type="danger" text="立即下单" @click="showCartBottom = true" />
     </van-action-bar>
     <!-- 购物车 -->
@@ -242,17 +328,11 @@ async function onSubmitCart() {
       position="bottom"
       :style="{ height: '93%' }"
     >
-      <!--      <van-steps :active="cartSize === 0 ? 0 : 1"> -->
-      <!--        <van-step>选择菜品</van-step> -->
-      <!--        <van-step>提交订单</van-step> -->
-      <!--        <van-step>制作订单</van-step> -->
-      <!--        <van-step>完成订单</van-step> -->
-      <!--      </van-steps> -->
       <van-swipe-cell>
         <div v-for="(card, idx1) in cartItemList" :key="idx1">
           <van-card
             v-if="card.stock !== 0"
-            class="goods-card"
+            :centered="true"
             :num="card.stock"
             :price="card.price / 100"
             :desc="card.description"
@@ -261,51 +341,138 @@ async function onSubmitCart() {
           />
         </div>
       </van-swipe-cell>
-      <van-submit-bar :price="cartTotalPrice" button-text="提交订单" :disabled="cartSize === 0" @submit="onSubmitCart">
-        <!--        <van-checkbox v-model="checkedAllCart">全选</van-checkbox> -->
+      <van-submit-bar :price="cartTotalPrice" button-text="提交订单" :disabled="cartIconSize === 0" @submit="onSubmitCart">
         <van-button size="mini" type="danger" text="清空购物车" @click="clearCart" />
       </van-submit-bar>
     </van-popup>
-    <!-- 右侧弹出 -->
+    <!-- 右侧弹出 历史订单详情 -->
     <van-popup
-      v-model:show="showOrderBottom"
+      v-model:show="showHisOrderBottom"
       position="right"
       round
       closeable
       close-icon-position="bottom-left"
       :style="{ width: '100%', height: '100%' }"
     >
-      <van-collapse v-model="collType">
-        <van-collapse-item title="标题1" name="1">
-          代码是写出来给人看的，附带能在机器上运行。
-        </van-collapse-item>
-        <van-collapse-item title="标题2" name="2">
-          技术无非就是那些开发它的人的共同灵魂。
-        </van-collapse-item>
-        <van-collapse-item title="标题3" name="3">
-          在代码阅读过程中人们说脏话的频率是衡量代码质量的唯一标准。
+      <van-collapse v-for="(item, index) in hisOrderDetailInfoList" :key="index" v-model="hisOrderCollType">
+        <van-collapse-item :title="`订单号: ${item.orderInfo.orderId}`" :name="index">
+          <template #title>
+            <span style="margin-right: 10px;">{{ `订单号: ${item.orderInfo.orderId}` }}</span>
+            <van-tag plain :type="hisOrderStateMap.get(item.orderInfo.orderStatus).type">
+              {{ hisOrderStateMap.get(item.orderInfo.orderStatus).tag }}
+            </van-tag>
+          </template>
+          <template #value>
+            <span>{{ formatDate(item.orderInfo.updateDate) }}</span>
+          </template>
+          <van-steps :active="hisOrderStateMap.get(item.orderInfo.orderStatus).id">
+            <van-step>选择菜品</van-step>
+            <van-step>提交订单</van-step>
+            <van-step>制作订单</van-step>
+            <van-step>完成订单</van-step>
+          </van-steps>
+          <div v-for="(card, idx2) in item.orderItemList" :key="idx2">
+            <van-card
+              :centered="true"
+              :num="card.orderItem.quantity"
+              :price="card.product.price / 100"
+              :desc="card.product.description"
+              :title="card.product.title"
+              :thumb="card.product.thumb"
+            />
+          </div>
+          <van-cell-group inset>
+            <van-cell title="总价格：" :value="`${item.orderInfo.totalPrice / 100} 元`" />
+          </van-cell-group>
         </van-collapse-item>
       </van-collapse>
     </van-popup>
-
+    <!-- 左侧弹出 统计信息 -->
     <van-popup
-      v-model:show="showEchartBottom"
+      v-model:show="showEChartBottom"
       position="left"
       round
       closeable
       close-icon-position="bottom-left"
       :style="{ width: '100%', height: '100%' }"
     />
-    <!--  商品详情  -->
+    <!--  顶部弹出 商品详情  -->
     <van-popup
-      v-model:show="showCardBottom"
+      v-model:show="showProductCardBottom"
       position="top"
       round
       closeable
       close-icon-position="bottom-left"
       :style="{ width: '100%', height: '95%' }"
     >
-      <h3>商品详情 {{ cardPropsDetail.title }}</h3>
+      <van-form @submit="onUpdateProductDetail">
+        <van-cell-group inset>
+          <van-field name="uploader" label="菜品图片">
+            <template #input>
+              <van-uploader :after-read="afterRead">
+                <van-image
+                  lazy-load
+                  :show-loading="avatarLoad"
+                  fit="cover"
+                  width="100"
+                  height="100"
+                  :src="productCardDetail.product.thumb"
+                >
+                  <template #loading>
+                    <van-loading type="spinner" size="20" />
+                  </template>
+                </van-image>
+              </van-uploader>
+            </template>
+          </van-field>
+          <van-field
+            v-model="productCardDetail.product.title"
+            name="菜品名称"
+            label="菜品名称"
+            :placeholder="productCardDetail.product.title"
+            :rules="[{ required: true, message: '填写' }]"
+          />
+          <van-field
+            v-model="productCardCategory"
+            is-link
+            readonly
+            name="菜品类别"
+            label="菜品类别"
+            placeholder="点击选择菜品类别"
+            @click="showProductStatusPicker = true"
+          />
+          <van-popup v-model:show="showProductStatusPicker" position="bottom">
+            <van-picker
+              :columns="categoryColumns"
+              @confirm="onConfirmCategory"
+              @cancel="showProductStatusPicker = false"
+            />
+          </van-popup>
+          <!--          <van-field name="stepper" label="菜品价格"> -->
+          <!--            <template #input> -->
+          <!--              <van-stepper v-model="" /> -->
+          <!--            </template> -->
+          <!--          </van-field> -->
+          <van-field name="rate" label="菜品评分">
+            <template #input>
+              <van-rate v-model="productCardDetail.product.rate" allow-half clearable />
+            </template>
+          </van-field>
+          <van-field
+            v-model="productCardDetail.product.description"
+            rows="1"
+            autosize
+            label="菜品描述"
+            type="textarea"
+            placeholder="填写菜品描述"
+          />
+        </van-cell-group>
+        <div style="margin: 16px;">
+          <van-button round block type="primary" native-type="submit">
+            更新商品信息
+          </van-button>
+        </div>
+      </van-form>
     </van-popup>
   </Container>
 </template>
