@@ -2,7 +2,16 @@
 import { showToast } from 'vant'
 import { ref } from 'vue'
 import { getProductCategory, getProductDetail, getProductList, updateProductInfo } from '@/api/product'
-import { clearCartHisInfo, confirm, getCartHisInfo, getOrderDetailInfo, orderItem } from '@/api/order'
+import {
+  backOrderInfo,
+  cancelOrderInfo,
+  clearCartHisInfo,
+  confirm,
+  doneOrderInfo,
+  getCartHisInfo,
+  getOrderDetailInfo,
+  orderItem,
+} from '@/api/order'
 import useUserStore from '@/stores/modules/user'
 import { formatDate } from '@/utils/timeUtil'
 
@@ -29,14 +38,14 @@ const currentOrderId = ref(0) // 当前页面订单Id
 // InstanceType：这是一个 TypeScript 的工具类型，用于从类或构造函数类型中提取实例类型。
 const indexBar = ref<InstanceType<typeof import('vant').IndexBar> | null>(null)
 // 历史订单详情
-const hisOrderCollType = ref(['1'])
+const hisOrderCollType = ref([])
 const showHisOrderBottom = ref(false)
 const hisOrderDetailInfoList = ref([])
 const hisOrderStateMap: Map<string, any> = new Map()
 hisOrderStateMap.set('WAITING_CONFIRM', { id: 0, tag: '选择菜品', type: 'primary' })
-hisOrderStateMap.set('WAITING_COMPLETED', { id: 1, tag: '提交订单', type: 'success' })
-hisOrderStateMap.set('COMPLETED', { id: 2, tag: '制作订单', type: 'danger' })
-hisOrderStateMap.set('FAILED', { id: 3, tag: '完成订单', type: 'warning' })
+hisOrderStateMap.set('WAITING_COMPLETED', { id: 1, tag: '制作订单', type: 'success' })
+hisOrderStateMap.set('COMPLETED', { id: 2, tag: '完成订单', type: 'danger' })
+hisOrderStateMap.set('FAILED', { id: 3, tag: '取消订单', type: 'warning' })
 // 统计信息
 const showEChartBottom = ref(false)
 // 购物车
@@ -214,7 +223,40 @@ async function afterRead(file: any) {
 /** --- 商品详情 end --- */
 
 /** --- 历史订单详情 start --- */
-
+async function getHisOrderDetailInfoList() {
+  const orderDetailRes = await getOrderDetailInfo(userStore.user.userId)
+  if (orderDetailRes.success) {
+    hisOrderDetailInfoList.value = orderDetailRes.data
+    hisOrderCollType.value = []
+    for (let i: number = 0; i < hisOrderDetailInfoList.value.length; i++) {
+      if (hisOrderDetailInfoList.value[i].orderInfo.orderStatus === 'WAITING_COMPLETED') {
+        hisOrderCollType.value.push(String(i + 1))
+        break
+      }
+    }
+  }
+}
+async function doneOrder(index: number) {
+  const promise = await doneOrderInfo(hisOrderDetailInfoList.value[index].orderInfo.orderId)
+  if (promise.success) {
+    showToast('订单已完成')
+    await getHisOrderDetailInfoList()
+  }
+}
+async function cancelOrder(index: number) {
+  const promise = await cancelOrderInfo(hisOrderDetailInfoList.value[index].orderInfo.orderId)
+  if (promise.success) {
+    showToast('订单已取消')
+    await getHisOrderDetailInfoList()
+  }
+}
+async function backOrder(index: number) {
+  const promise = await backOrderInfo(hisOrderDetailInfoList.value[index].orderInfo.orderId)
+  if (promise.success) {
+    showToast('订单已回退')
+    await initMenuInfo()
+  }
+}
 /** --- 历史订单详情 end --- */
 
 /** --- 统计信息 start --- */
@@ -252,10 +294,7 @@ async function initMenuInfo() {
   // 获取上次选择的购物车信息
   await updateCartInfo()
   // 获取之前的订单信息
-  const orderDetailRes = await getOrderDetailInfo(userStore.user.userId)
-  if (orderDetailRes.success) {
-    hisOrderDetailInfoList.value = orderDetailRes.data
-  }
+  await getHisOrderDetailInfoList()
   // todo 获取统计信息
 }
 </script>
@@ -354,8 +393,8 @@ async function initMenuInfo() {
       close-icon-position="bottom-left"
       :style="{ width: '100%', height: '100%' }"
     >
-      <van-collapse v-for="(item, index) in hisOrderDetailInfoList" :key="index" v-model="hisOrderCollType">
-        <van-collapse-item :title="`订单号: ${item.orderInfo.orderId}`" :name="index">
+      <van-collapse v-model="hisOrderCollType">
+        <van-collapse-item v-for="(item, index) in hisOrderDetailInfoList" :key="index" :title="`订单号: ${item.orderInfo.orderId}`" :name="`${String(index + 1)}`">
           <template #title>
             <span style="margin-right: 10px;">{{ `订单号: ${item.orderInfo.orderId}` }}</span>
             <van-tag plain :type="hisOrderStateMap.get(item.orderInfo.orderStatus).type">
@@ -367,9 +406,13 @@ async function initMenuInfo() {
           </template>
           <van-steps :active="hisOrderStateMap.get(item.orderInfo.orderStatus).id">
             <van-step>选择菜品</van-step>
-            <van-step>提交订单</van-step>
             <van-step>制作订单</van-step>
-            <van-step>完成订单</van-step>
+            <van-step v-if="item.orderInfo.orderStatus !== 'FAILED'">
+              完成订单
+            </van-step>
+            <van-step v-else>
+              取消订单
+            </van-step>
           </van-steps>
           <div v-for="(card, idx2) in item.orderItemList" :key="idx2">
             <van-card
@@ -384,6 +427,17 @@ async function initMenuInfo() {
           <van-cell-group inset>
             <van-cell title="总价格：" :value="`${item.orderInfo.totalPrice / 100} 元`" />
           </van-cell-group>
+          <van-row v-if="item.orderInfo.orderStatus === 'WAITING_COMPLETED'" justify="end">
+            <van-col span="4">
+              <van-button size="mini" type="success" text="制作完成" @click="doneOrder(index)" />
+            </van-col>
+            <van-col span="4">
+              <van-button size="mini" type="danger" text="取消订单" @click="cancelOrder(index)" />
+            </van-col>
+            <van-col span="4">
+              <van-button size="mini" type="warning" text="回退订单" @click="backOrder(index)" />
+            </van-col>
+          </van-row>
         </van-collapse-item>
       </van-collapse>
     </van-popup>
@@ -448,11 +502,13 @@ async function initMenuInfo() {
               @cancel="showProductStatusPicker = false"
             />
           </van-popup>
-          <!--          <van-field name="stepper" label="菜品价格"> -->
-          <!--            <template #input> -->
-          <!--              <van-stepper v-model="" /> -->
-          <!--            </template> -->
-          <!--          </van-field> -->
+          <!--          <van-field -->
+          <!--              v-model="productCardDetail.product.price" -->
+          <!--              name="菜品价格" -->
+          <!--              label="菜品价格" -->
+          <!--              :placeholder="productCardDetail.product.price" -->
+          <!--              :rules="[{ required: true, message: '填写价格' }]" -->
+          <!--          /> -->
           <van-field name="rate" label="菜品评分">
             <template #input>
               <van-rate v-model="productCardDetail.product.rate" allow-half clearable />

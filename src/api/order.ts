@@ -19,3 +19,15 @@ export function confirm(orderId: number) {
 export function getOrderDetailInfo(userId: number) {
   return request({ url: `/order/getOrderDetailInfo/${userId}`, method: 'get' })
 }
+
+export function doneOrderInfo(orderId: number) {
+  return request({ url: `/order/done/${orderId}`, method: 'get' })
+}
+
+export function cancelOrderInfo(orderId: number) {
+  return request({ url: `/order/cancel/${orderId}`, method: 'get' })
+}
+
+export function backOrderInfo(orderId: number) {
+  return request({ url: `/order/back/${orderId}`, method: 'get' })
+}
