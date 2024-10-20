@@ -162,7 +162,7 @@ const onRefresh = () => {
           fit="cover"
           width="9rem"
           height="7rem"
-          @click="router.push({ path: '/video/info',
+          @click="router.push({ path: '/home/video/info',
                                 query: {
                                   videoId: item.videoId,
                                   title: item.title,
