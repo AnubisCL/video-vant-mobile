@@ -13,7 +13,7 @@ import {
   orderItem,
 } from '@/api/order'
 import useUserStore from '@/stores/modules/user'
-import { formatDate } from '@/utils/timeUtil'
+import { getNextDay, getToday } from '@/utils/timeUtil'
 import { uploadFile } from '@/api/video'
 
 definePage({
@@ -34,7 +34,12 @@ const activeLeftSidebarIndex = ref(0)
 const indexBarList = ref([])
 const productIdItemList = ref([])
 const cartIconSize = ref(0)
-const currentOrderId = ref(0) // 当前页面订单Id
+const confirmOrderInfo = reactive({
+  orderId: 0,
+  orderType: '',
+  orderDate: '',
+  orderRemark: '',
+}) // 当前页面订单Id
 // InstanceType<typeof import('vant').IndexBar>：这部分是用来获取 van-index-bar 组件实例的类型。
 // typeof import('vant').IndexBar：导入 van-index-bar 组件的类型。
 // InstanceType：这是一个 TypeScript 的工具类型，用于从类或构造函数类型中提取实例类型。
@@ -51,6 +56,7 @@ hisOrderStateMap.set('FAILED', { id: 3, tag: '取消订单', type: 'warning' })
 // 统计信息
 const showEChartBottom = ref(false)
 // 购物车
+const showConfirmOrderCenterBottom = ref(false)
 const showCartBottom = ref(false)
 const cartItemList = ref([])
 const cartTotalPrice = computed(() => {
@@ -121,7 +127,7 @@ async function updateCartInfo() {
   const cartRes = await getCartHisInfo(userStore.user.userId)
   if (cartRes.success) {
     cartItemList.value = cartRes.data.cartItemList
-    currentOrderId.value = cartRes.data.currentOrderId
+    confirmOrderInfo.orderId = cartRes.data.currentOrderId
     // 左侧边栏 标识 菜单列表 标识 购物车badge
     updateIndexBarBadgeAndProductIdItemTag()
     cartIconSize.value = cartItemList.value.length
@@ -143,7 +149,7 @@ async function addCart(idx1: number, idx2: any) {
     type: 'add',
     productId,
     userId: userStore.user.userId,
-    orderId: currentOrderId.value,
+    orderId: confirmOrderInfo.orderId,
   })
   if (res.success) {
     showToast('添加到购物车成功')
@@ -164,7 +170,7 @@ async function subCart(idx1: number, idx2: any) {
     type: 'sub',
     productId,
     userId: userStore.user.userId,
-    orderId: currentOrderId.value,
+    orderId: confirmOrderInfo.orderId,
   })
   if (res.success) {
     leftSidebarItem.value[idx1].badge--
@@ -181,11 +187,15 @@ async function subCart(idx1: number, idx2: any) {
 }
 
 async function onSubmitCart() {
-  const res = await confirm(currentOrderId.value)
+  showConfirmOrderCenterBottom.value = true
+}
+
+async function onSubmitOrder() {
+  const res = await confirm({}, confirmOrderInfo)
   if (res.success) {
     showToast(`订单号：${res.data.orderId}，下单成功`)
     await initMenuInfo()
-    showCartBottom.value = false
+    showConfirmOrderCenterBottom.value = false
   }
 }
 /** --- 购物车 end --- */
@@ -362,7 +372,7 @@ async function initMenuInfo() {
         @click="showCartBottom = true"
       />
       <van-action-bar-button color="#7232dd" type="warning" text="查看订单" @click="showHisOrderBottom = true" />
-      <van-action-bar-button color="#8F6EBA" type="warning" text="统计信息" @click="showEChartBottom = true" />
+      <!--      <van-action-bar-button color="#8F6EBA" type="warning" text="统计信息" @click="showEChartBottom = true" /> -->
       <van-action-bar-button color="#be99ff" type="danger" text="立即下单" @click="showCartBottom = true" />
     </van-action-bar>
     <!-- 购物车 -->
@@ -391,6 +401,65 @@ async function initMenuInfo() {
         <van-button size="mini" type="danger" text="清空购物车" @click="clearCart" />
       </van-submit-bar>
     </van-popup>
+    <!-- 圆角弹窗（居中） -->
+    <van-popup v-model:show="showConfirmOrderCenterBottom" round :style="{ padding: '20px' }">
+      <van-form @submit="onSubmitOrder">
+        <van-cell-group inset>
+          <van-field
+            v-model="confirmOrderInfo.orderDate"
+            name="订单日期"
+            label="订单日期"
+            placeholder="YYYY-MM-dd"
+            :rules="[{ required: true, message: '填写订单日期(YYYY-MM-dd)' }]"
+          />
+          <van-space style="padding: 0 16px;">
+            <van-button size="mini" plain type="primary" @click="confirmOrderInfo.orderDate = getToday()">
+              {{ getToday() }}
+            </van-button>
+            <van-button size="mini" plain type="primary" @click="confirmOrderInfo.orderDate = getNextDay()">
+              {{ getNextDay() }}
+            </van-button>
+          </van-space>
+          <van-field
+            v-model="confirmOrderInfo.orderType"
+            is-link
+            readonly
+            name="订单类别"
+            label="订单类别"
+            placeholder="（早/中/晚）"
+          />
+          <van-space style="padding: 0 16px;">
+            <van-button size="mini" plain type="primary" @click="confirmOrderInfo.orderType = '早'">
+              早
+            </van-button>
+            <van-button size="mini" plain type="primary" @click="confirmOrderInfo.orderType = '中'">
+              中
+            </van-button>
+            <van-button size="mini" plain type="primary" @click="confirmOrderInfo.orderType = '晚'">
+              晚
+            </van-button>
+          </van-space>
+          <van-field
+            v-model="confirmOrderInfo.orderRemark"
+            rows="1"
+            autosize
+            label="订单备注"
+            type="textarea"
+            placeholder="订单备注"
+          />
+          <van-space style="padding: 0 16px;">
+            <van-button size="mini" plain type="primary" @click="confirmOrderInfo.orderRemark = '备注'">
+              默认
+            </van-button>
+          </van-space>
+        </van-cell-group>
+        <div style="margin: 16px;">
+          <van-button round block type="primary" native-type="submit">
+            下单
+          </van-button>
+        </div>
+      </van-form>
+    </van-popup>
     <!-- 右侧弹出 历史订单详情 -->
     <van-popup
       v-model:show="showHisOrderBottom"
@@ -403,13 +472,20 @@ async function initMenuInfo() {
       <van-collapse v-model="hisOrderCollType">
         <van-collapse-item v-for="(item, index) in hisOrderDetailInfoList" :key="index" :title="`订单号: ${item.orderInfo.orderId}`" :name="`${String(index + 1)}`">
           <template #title>
-            <span style="margin-right: 10px;">{{ `订单号: ${item.orderInfo.orderId}` }}</span>
-            <van-tag plain :type="hisOrderStateMap.get(item.orderInfo.orderStatus).type">
-              {{ hisOrderStateMap.get(item.orderInfo.orderStatus).tag }}
-            </van-tag>
+            <van-space>
+              <van-highlight :keywords="`${item.orderInfo.orderId}`" :source-string="`订单号: ${item.orderInfo.orderId}`" />
+              <van-tag plain :type="hisOrderStateMap.get(item.orderInfo.orderStatus).type">
+                {{ hisOrderStateMap.get(item.orderInfo.orderStatus).tag }}
+              </van-tag>
+              <van-tag color="#7232dd" plain>
+                {{ item.orderInfo.orderType }}
+              </van-tag>
+            </van-space>
           </template>
           <template #value>
-            <span>{{ formatDate(item.orderInfo.updateDate) }}</span>
+            <van-tag color="#ffe1e1" text-color="#ad0000">
+              {{ item.orderInfo.orderDate }}
+            </van-tag>
           </template>
           <van-steps :active="hisOrderStateMap.get(item.orderInfo.orderStatus).id">
             <van-step>选择菜品</van-step>
@@ -433,6 +509,7 @@ async function initMenuInfo() {
           </div>
           <van-cell-group inset>
             <van-cell title="总价格：" :value="`${item.orderInfo.totalPrice / 100} 元`" />
+            <van-cell title="订单备注：" :value="item.orderInfo.orderRemark" />
           </van-cell-group>
           <van-row v-if="item.orderInfo.orderStatus === 'WAITING_COMPLETED'" justify="end">
             <van-col span="4">
