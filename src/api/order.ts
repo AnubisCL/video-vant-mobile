@@ -31,3 +31,7 @@ export function cancelOrderInfo(orderId: number) {
 export function backOrderInfo(orderId: number) {
   return request({ url: `/order/back/${orderId}`, method: 'get' })
 }
+
+export function getOrderSize(userId: number) {
+  return request({ url: `/order/getOrderSize/${userId}`, method: 'get' })
+}

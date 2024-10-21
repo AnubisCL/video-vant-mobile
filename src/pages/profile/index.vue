@@ -5,6 +5,7 @@ import { languageColumns, locale } from '@/utils/i18n'
 import useAppStore from '@/stores/modules/app'
 import useUserStore from '@/stores/modules/user'
 import { getAvatar } from '@/api/user'
+import { getOrderSize } from '@/api/order'
 
 definePage({
   name: 'profile',
@@ -29,13 +30,23 @@ const user = reactive({
 })
 // 用户头像
 const avatar = ref('')
+const orderBadge = ref(0)
 
 onMounted(() => {
   user.username = userStore.user.username
   user.email = userStore.user.email
   user.roleId = userStore.user.roleId
   getAvatarBase64()
+  initOrderBadge()
 })
+
+async function initOrderBadge() {
+  const res = await getOrderSize(userStore.user.userId)
+  if (res.success) {
+    orderBadge.value = res.data
+  }
+}
+
 // 暗黑模式
 watch(() => isDark.value, (newMode) => {
   checked.value = newMode
@@ -144,7 +155,8 @@ function goToOrderDetail() {
         is-link :title="t('profile.order')" @click="goToOrderDetail"
       >
         <template #right-icon>
-          <van-icon name="cart-o" badge="2" class="search-icon" />
+          <van-icon v-if="orderBadge <= 0" name="cart-o" class="search-icon" />
+          <van-icon v-else name="cart-o" :badge="orderBadge" class="search-icon" />
         </template>
       </van-cell>
       <van-cell
