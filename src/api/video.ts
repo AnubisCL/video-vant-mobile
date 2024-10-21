@@ -39,3 +39,14 @@ export function removeCollect(videoId?: any) {
 export function isCollect(videoId?: any) {
   return request({ url: `/collect/isCollect/${videoId}`, method: 'get' })
 }
+
+export function uploadFile(params?: any, data?: any) {
+  // 注意这里的内容类型
+  return request({
+    url: '/video/uploadFile',
+    method: 'post',
+    params,
+    data,
+    headers: { 'Content-Type': 'multipart/form-data' },
+  })
+}

@@ -14,6 +14,7 @@ import {
 } from '@/api/order'
 import useUserStore from '@/stores/modules/user'
 import { formatDate } from '@/utils/timeUtil'
+import { uploadFile } from '@/api/video'
 
 definePage({
   name: 'menu',
@@ -197,6 +198,7 @@ function onConfirmCategory({ selectedOptions }) {
 
 async function onUpdateProductDetail() {
   const product = productCardDetail.value.product
+  product.thumb = productCardDetail.value.product.tempThumb
   const res = await updateProductInfo({}, product)
   if (res.success) {
     showToast('商品信息更新成功')
@@ -211,14 +213,15 @@ async function afterRead(file: any) {
   const formData = new FormData()
   formData.append('file', file.file)
   // 此时可以自行将文件上传至服务器
-  // const res = await uploadAvatar({}, formData)
-  // if (res.success) {
-  // await getAvatarBase64()
-  //   showToast('上传成功')
-  // }
-  // else {
-  //   showToast('上传失败')
-  // }
+  const res = await uploadFile({}, formData)
+  if (res.success) {
+    productCardDetail.value.product.thumb = res.data.replaceFileUrl
+    productCardDetail.value.product.tempThumb = res.data.fileUrl
+    showToast('上传成功')
+  }
+  else {
+    showToast('上传失败')
+  }
 }
 /** --- 商品详情 end --- */
 
