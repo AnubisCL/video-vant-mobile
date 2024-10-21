@@ -470,7 +470,7 @@ async function initMenuInfo() {
         <van-cell-group inset>
           <van-field name="uploader" label="菜品图片">
             <template #input>
-              <van-uploader :after-read="afterRead">
+              <van-uploader :max-size="5000 * 1024" :after-read="afterRead">
                 <van-image
                   lazy-load
                   :show-loading="avatarLoad"
