@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { PickerColumn } from 'vant'
+import type { RouteLocationRaw } from 'vue-router'
 import { languageColumns, locale } from '@/utils/i18n'
 import useAppStore from '@/stores/modules/app'
 import useUserStore from '@/stores/modules/user'
@@ -61,6 +62,11 @@ async function getAvatarBase64() {
   if (res.success) {
     avatar.value = res.data
   }
+}
+
+function goToOrderDetail() {
+  const path: RouteLocationRaw = { name: 'menu', path: '/home/menu', hash: '#order' }
+  router.push(path)
 }
 </script>
 
@@ -131,6 +137,14 @@ async function getAvatarBase64() {
       >
         <template #right-icon>
           <van-icon name="browsing-history-o" class="search-icon" />
+        </template>
+      </van-cell>
+      <van-cell
+        v-if="userStore.checkPermissions('profile.order')"
+        is-link :title="t('profile.order')" @click="goToOrderDetail"
+      >
+        <template #right-icon>
+          <van-icon name="cart-o" badge="2" class="search-icon" />
         </template>
       </van-cell>
       <van-cell

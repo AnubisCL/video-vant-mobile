@@ -26,6 +26,7 @@ definePage({
 })
 // todo 国际化 const { t } = useI18n()
 const userStore = useUserStore()
+const route = useRoute()
 
 // 菜单页面
 const leftSidebarItem = ref([])
@@ -206,7 +207,7 @@ async function onUpdateProductDetail() {
   await initMenuInfo()
   showProductCardBottom.value = false
 }
-// todo 上传菜品图片
+// 上传菜品图片
 const avatarLoad = ref(false)
 // 上传完成
 async function afterRead(file: any) {
@@ -268,6 +269,9 @@ async function backOrder(index: number) {
 // 初始化页面
 onMounted(() => {
   initMenuInfo()
+  if (route.hash === '#order') {
+    showHisOrderBottom.value = true
+  }
 })
 async function initMenuInfo() {
   // 菜单分类
