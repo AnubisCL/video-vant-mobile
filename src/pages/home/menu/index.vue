@@ -82,7 +82,7 @@ const productCardDetail = ref({
   },
   productDetail: {},
 })
-const uploadFileUrl = ref([])
+const uploadFileUrl = ref([{ url: 'https://fastly.jsdelivr.net/npm/@vant/assets/ipad.jpeg' }])
 
 /** --- 菜单页面 start --- */
 function leftSidebarChange(index: number) {
@@ -141,15 +141,15 @@ async function createProductCardDetail() {
   productCardDetail.value = {
     product: {
       title: '',
-      price: 1,
-      thumb: '',
+      price: 100,
+      thumb: 'https://fastly.jsdelivr.net/npm/@vant/assets/ipad.jpeg',
       tempThumb: '',
       description: '',
       rate: 0,
     },
     productDetail: {},
   }
-  uploadFileUrl.value = []
+  uploadFileUrl.value = [{ url: 'https://fastly.jsdelivr.net/npm/@vant/assets/ipad.jpeg' }]
 }
 async function closeProductForm() {
   showProductCardBottom.value = false
