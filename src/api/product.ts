@@ -15,3 +15,6 @@ export function getProductDetail(productDetailId?: number) {
 export function updateProductInfo(params?: any, data?: any) {
   return request({ url: `/product/updateProductInfo`, method: 'post', params, data })
 }
+export function createProductInfo(params?: any, data?: any) {
+  return request({ url: `/product/createProductInfo`, method: 'post', params, data })
+}

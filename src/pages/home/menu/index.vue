@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { showToast } from 'vant'
 import { ref } from 'vue'
-import { getProductCategory, getProductDetail, getProductList, updateProductInfo } from '@/api/product'
+import { createProductInfo, getProductCategory, getProductDetail, getProductList, updateProductInfo } from '@/api/product'
 import {
   backOrderInfo,
   cancelOrderInfo,
@@ -64,10 +64,25 @@ const cartTotalPrice = computed(() => {
 })
 // 商品详情
 const showProductCardBottom = ref(false)
+const showAddProductBottom = ref(false)
+const showProductForm = computed(() => {
+  return showProductCardBottom.value || showAddProductBottom.value
+})
 const showProductStatusPicker = ref(false)
 const categoryColumns = ref([])
 const productCardCategory = ref('')
-const productCardDetail = ref({})
+const productCardDetail = ref({
+  product: {
+    title: '',
+    price: 100,
+    thumb: 'https://fastly.jsdelivr.net/npm/@vant/assets/ipad.jpeg',
+    tempThumb: '',
+    description: '',
+    rate: 0,
+  },
+  productDetail: {},
+})
+const uploadFileUrl = ref([])
 
 /** --- 菜单页面 start --- */
 function leftSidebarChange(index: number) {
@@ -113,12 +128,32 @@ async function showProductCardDetail(idx1: number, idx2: any) {
       product,
       productDetail: productDetailRes.data,
     }
+    uploadFileUrl.value = [{ url: product.thumb }]
     categoryColumns.value.forEach((colum) => {
       if (colum.value === product.categoryId) {
         productCardCategory.value = colum.text
       }
     })
   }
+}
+async function createProductCardDetail() {
+  showAddProductBottom.value = true
+  productCardDetail.value = {
+    product: {
+      title: '',
+      price: 1,
+      thumb: '',
+      tempThumb: '',
+      description: '',
+      rate: 0,
+    },
+    productDetail: {},
+  }
+  uploadFileUrl.value = []
+}
+async function closeProductForm() {
+  showProductCardBottom.value = false
+  showAddProductBottom.value = false
 }
 /** --- 菜单页面 end --- */
 
@@ -216,9 +251,22 @@ async function onUpdateProductDetail() {
   }
   await initMenuInfo()
   showProductCardBottom.value = false
+  showAddProductBottom.value = false
 }
+
+async function onCreateProductDetail() {
+  const product = productCardDetail.value.product
+  product.thumb = productCardDetail.value.product.tempThumb
+  const res = await createProductInfo({}, product)
+  if (res.success) {
+    showToast('商品信息新增成功')
+  }
+  await initMenuInfo()
+  showProductCardBottom.value = false
+  showAddProductBottom.value = false
+}
+
 // 上传菜品图片
-const avatarLoad = ref(false)
 // 上传完成
 async function afterRead(file: any) {
   const formData = new FormData()
@@ -228,6 +276,7 @@ async function afterRead(file: any) {
   if (res.success) {
     productCardDetail.value.product.thumb = res.data.replaceFileUrl
     productCardDetail.value.product.tempThumb = res.data.fileUrl
+    uploadFileUrl.value = [{ url: res.data.replaceFileUrl }]
     showToast('上传成功')
   }
   else {
@@ -368,8 +417,11 @@ async function initMenuInfo() {
     <!-- 底部按钮 -->
     <van-action-bar>
       <van-action-bar-icon
-        icon="cart-o" text="购物车" style="margin-right: 70px; padding-left: 10px;" :badge="cartIconSize"
+        icon="cart-o" text="购物车" style="margin-right: 10px; padding-left: 10px;" :badge="cartIconSize"
         @click="showCartBottom = true"
+      />
+      <van-action-bar-icon
+        icon="new-o" text="新增菜品" style="margin-right: 10px; padding-left: 10px;" @click="createProductCardDetail"
       />
       <van-action-bar-button color="#7232dd" type="warning" text="查看订单" @click="showHisOrderBottom = true" />
       <!--      <van-action-bar-button color="#8F6EBA" type="warning" text="统计信息" @click="showEChartBottom = true" /> -->
@@ -402,7 +454,7 @@ async function initMenuInfo() {
       </van-submit-bar>
     </van-popup>
     <!-- 圆角弹窗（居中） -->
-    <van-popup v-model:show="showConfirmOrderCenterBottom" round :style="{ padding: '20px' }">
+    <van-popup v-model:show="showConfirmOrderCenterBottom" closeable close-icon="close" round :style="{ padding: '20px' }">
       <van-form @submit="onSubmitOrder">
         <van-cell-group inset>
           <van-field
@@ -535,19 +587,23 @@ async function initMenuInfo() {
       :style="{ width: '100%', height: '100%' }"
     />
     <!--  顶部弹出 商品详情  -->
+    <!--  底部弹出 新增商品  -->
     <van-popup
-      v-model:show="showProductCardBottom"
-      position="top"
+      v-model:show="showProductForm"
       round
       closeable
+      position="top"
       close-icon-position="bottom-left"
       :style="{ width: '100%', height: '95%' }"
+      @click-overlay="closeProductForm"
+      @click-close-icon="closeProductForm"
     >
-      <van-form @submit="onUpdateProductDetail">
+      <van-form @submit="showProductCardBottom ? onUpdateProductDetail() : onCreateProductDetail()">
         <van-cell-group inset>
           <van-field name="uploader" label="菜品图片">
             <template #input>
-              <van-uploader :max-size="5000 * 1024" :after-read="afterRead">
+              <van-uploader v-model="uploadFileUrl" :max-size="5000 * 1024" multiple :max-count="1" :after-read="afterRead" />
+              <!--              <van-uploader :max-size="5000 * 1024" :after-read="afterRead">
                 <van-image
                   lazy-load
                   :show-loading="avatarLoad"
@@ -560,7 +616,7 @@ async function initMenuInfo() {
                     <van-loading type="spinner" size="20" />
                   </template>
                 </van-image>
-              </van-uploader>
+              </van-uploader> -->
             </template>
           </van-field>
           <van-field
@@ -609,7 +665,7 @@ async function initMenuInfo() {
         </van-cell-group>
         <div style="margin: 16px;">
           <van-button round block type="primary" native-type="submit">
-            更新商品信息
+            {{ showAddProductBottom ? '更新商品信息' : '添加商品信息' }}
           </van-button>
         </div>
       </van-form>
