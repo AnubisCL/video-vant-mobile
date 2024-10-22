@@ -12,6 +12,6 @@ export function getToday() {
 
 export function getNextDay() {
   const date = new Date()
-  date.setDate(date.getDate() - 1)
+  date.setDate(date.getDate() + 1)
   return format(date, 'yyyy-MM-dd')
 }
