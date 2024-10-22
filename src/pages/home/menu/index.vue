@@ -665,7 +665,7 @@ async function initMenuInfo() {
         </van-cell-group>
         <div style="margin: 16px;">
           <van-button round block type="primary" native-type="submit">
-            {{ showAddProductBottom ? '更新商品信息' : '添加商品信息' }}
+            {{ showAddProductBottom ? '添加商品信息' : '更新商品信息' }}
           </van-button>
         </div>
       </van-form>
