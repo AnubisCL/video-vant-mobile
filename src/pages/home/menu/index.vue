@@ -230,7 +230,9 @@ async function onSubmitOrder() {
   if (res.success) {
     showToast(`订单号：${res.data.orderId}，下单成功`)
     await initMenuInfo()
+    showCartBottom.value = false
     showConfirmOrderCenterBottom.value = false
+    showHisOrderBottom.value = true
   }
 }
 /** --- 购物车 end --- */
@@ -318,6 +320,7 @@ async function backOrder(index: number) {
   if (promise.success) {
     showToast('订单已回退')
     await initMenuInfo()
+    showHisOrderBottom.value = false
   }
 }
 /** --- 历史订单详情 end --- */
