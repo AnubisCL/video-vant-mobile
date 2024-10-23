@@ -28,7 +28,6 @@ const pageRes = reactive({
 })
 const keyword = ref('')
 const loading = ref(false)
-const searchBgColor = ref('rgba(60,99,157,0.94)')
 
 onMounted(() => {
   initPageHis()
@@ -149,7 +148,7 @@ const onRefresh = () => {
       v-model="keyword"
       :disabled="loading"
       shape="round"
-      :background="searchBgColor"
+      background="#be99ff"
       placeholder="请输入搜索关键词"
       @search="onSearch"
       @cancel="onCancel"

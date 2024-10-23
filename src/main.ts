@@ -1,6 +1,7 @@
 import { createApp } from 'vue'
 import { createHead } from '@unhead/vue'
 import { Lazyload } from 'vant'
+import Vue3Lottie from 'vue3-lottie'
 import App from '@/App.vue'
 import router from '@/router'
 import pinia from '@/stores'
@@ -11,7 +12,7 @@ import { i18n } from '@/utils/i18n'
 
 // Vant 桌面端适配
 import '@vant/touch-emulator'
-
+// 动画
 /* --------------------------------
 Vant 中有个别组件是以函数的形式提供的，
 包括 Toast，Dialog，Notify 和 ImagePreview 组件。
@@ -37,5 +38,5 @@ app.use(i18n) // 挂载i18n 国际化
 app.use(pinia) // 挂载pinia store
 app.use(Lazyload) // 挂载懒加载
 app.use(router) // 挂载路由
-
+app.use(Vue3Lottie)
 app.mount('#app')

@@ -9,6 +9,7 @@ declare module 'vue' {
   export interface GlobalComponents {
     Chart: typeof import('./components/Chart/index.vue')['default']
     Container: typeof import('./components/Container.vue')['default']
+    Lottie: typeof import('./components/Lottie/index.vue')['default']
     NavBar: typeof import('./components/NavBar.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
@@ -44,6 +45,7 @@ declare module 'vue' {
     VanPicker: typeof import('vant/es')['Picker']
     VanPopup: typeof import('vant/es')['Popup']
     VanRadio: typeof import('vant/es')['Radio']
+    VanRadioGroup: typeof import('vant/es')['RadioGroup']
     VanRate: typeof import('vant/es')['Rate']
     VanRollingText: typeof import('vant/es')['RollingText']
     VanRow: typeof import('vant/es')['Row']

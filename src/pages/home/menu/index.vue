@@ -391,13 +391,17 @@ async function initMenuInfo() {
             <van-card
               v-for="(card, idx2) in item.cardList" :key="idx2"
               :num="card.stock"
-              :tag="card.tag"
               :price="card.price / 100"
               :desc="card.description"
               :title="card.title"
               :thumb="card.thumb"
               @click-thumb="showProductCardDetail(idx1, idx2)"
             >
+              <template #tag>
+                <van-tag mark color="#7232dd">
+                  {{ card.tag }}
+                </van-tag>
+              </template>
               <template #tags>
                 <!--                <van-tag style="margin: 0 3px;" color="#7232dd" v-for="tag in card.tags" plain :type="tag.type">{{ tag.text }}</van-tag> -->
                 <van-rate v-model="card.rate" readonly allow-half />
