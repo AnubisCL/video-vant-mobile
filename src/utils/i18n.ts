@@ -7,13 +7,19 @@ import zhCN from 'vant/es/locale/lang/zh-CN'
  * at once using the import syntax
  */
 import messages from '@intlify/unplugin-vue-i18n/messages'
-import { Locale, type PickerColumn } from 'vant'
+import { Locale } from 'vant'
 
 /** 默认语言包名称 */
 const FALLBACK_LOCALE = 'zh-CN'
 
 /** 多语言 picker columns */
-export const languageColumns: PickerColumn = [
+export const languageColumns: ({
+  text: string
+  value: string
+} | {
+  text: string
+  value: string
+})[] = [
   { text: '简体中文', value: 'zh-CN' },
   { text: 'English', value: 'en-US' },
 ]

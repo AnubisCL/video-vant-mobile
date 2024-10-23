@@ -2,6 +2,7 @@
 import useUserStore from '@/stores/modules/user'
 import { localStorage } from '@/utils/local-storage'
 import { HISTORY_ACCOUNT, HISTORY_PASSWORD, SAVE_PASSWORD } from '@/stores/mutation-type'
+import number from '@/composables/humber.json'
 
 definePage({
   name: 'login',
@@ -11,6 +12,7 @@ definePage({
 })
 
 const userStore = useUserStore()
+const animation = number
 const { t } = useI18n()
 const userForm = reactive({
   account: '',
@@ -59,7 +61,7 @@ function randomUsername() {
     <!--      style="background-image: " -->
     <div style="">
       <Vue3Lottie
-        animation-link="./src/composables/humber.json"
+        :animation-data="animation"
         :height="200"
         :width="200"
         :auto-play="true"
