@@ -48,7 +48,7 @@ async function initOrderBadge() {
 }
 
 // 暗黑模式
-watch(() => isDark.value, (newMode) => {
+watch(() => isDark.value, (newMode: any) => {
   checked.value = newMode
 }, { immediate: true })
 
@@ -79,6 +79,10 @@ function goToOrderDetail() {
   const path: RouteLocationRaw = { name: 'menu', path: '/home/menu', hash: '#order' }
   router.push(path)
 }
+
+async function sendWsMsg() {
+  await userStore.sendMsg({ type: 'msg', msg: `${userStore.user.userId}:hello ws` })
+}
 </script>
 
 <template>
@@ -103,7 +107,7 @@ function goToOrderDetail() {
           <span>{{ user.email }}</span>
         </template>
         <template #value>
-          <van-space direction="vertical" fill>
+          <van-space direction="vertical" fill @click="sendWsMsg">
             <van-tag v-if="user.roleId === 1" style="margin-top: 40px; right: 80px;" size="large" type="danger">
               {{ t('profile.admin') }}
             </van-tag>
