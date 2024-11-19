@@ -32,19 +32,7 @@ watch(
   },
   { immediate: true, deep: true }, // 立即执行一次以初始化 player
 )
-// onMounted(() => {
-//   if (props.options.sources.length > 0) {
-//     player.value = videoJs(rVideoPlayer.value as Element, props.options)
-//   }
-// })
-//
-// // 或者使用 onUpdated
-// onUpdated(() => {
-//   if (rVideoPlayer.value && player.value) {
-//     player.value.dispose() // 先销毁旧的 player
-//     player.value = videoJs(rVideoPlayer.value as Element, props.options)
-//   }
-// })
+
 onUnmounted(() => {
   if (player.value) {
     player.value.dispose()

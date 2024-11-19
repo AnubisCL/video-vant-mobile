@@ -47,6 +47,7 @@ const videoOption = reactive({
   sources: [],
   width: '100%',
   height: '100%',
+  playbackRates: [0.75, 1, 1.25, 1.5, 2, 3], // 倍速播放选项
 })
 
 const splitVideoId = computed<string>(() => {
