@@ -25,6 +25,12 @@ export default ({ mode }: ConfigEnv): UserConfig => {
           changeOrigin: true,
           rewrite: path => path.replace(/^\/api/, ''),
         },
+        '/ws': {
+          target: 'http://127.0.0.1:7077/ws/',
+          ws: true,
+          changeOrigin: true,
+          rewrite: path => path.replace(/^\/ws/, ''),
+        },
       },
     },
 
