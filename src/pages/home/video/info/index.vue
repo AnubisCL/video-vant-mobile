@@ -8,6 +8,7 @@ import { showToast } from 'vant' // 延迟加载NProgress样式
 import VideoPlayer from '@/components/VideoPlayer.vue'
 import {
   collectDo,
+  getTags,
   historyCount,
   historyDo,
   isCollect,
@@ -62,6 +63,7 @@ const splitVideoId = computed<string>(() => {
 
 const isLikeStatus = ref(false)
 const isStarStatus = ref(false)
+const tags = ref([])
 
 const likeItem = reactive({
   iconColor: '',
@@ -97,6 +99,13 @@ onMounted(() => {
 })
 
 async function initVideoInfo() {
+  const resTags = await getTags(videoItem.id)
+  if (resTags.success) {
+    resTags.data.forEach((item) => {
+      tags.value.push(item.tagName)
+    })
+  }
+
   const count = await likeCount(videoItem.id)
   if (count.success) {
     likeItem.badge = count.data
@@ -242,6 +251,13 @@ async function toStar() {
     <van-row justify="center">
       <van-col style="margin: 5px 0;" span="20">
         <van-text-ellipsis :content="videoItem.title" expand-text="展开" collapse-text="收起" />
+      </van-col>
+    </van-row>
+    <van-row justify="left">
+      <van-col v-for="(tag, index) in tags" :key="index" style="text-align: center;" span="5">
+        <van-tag color="#7232dd">
+          {{ tag }}
+        </van-tag>
       </van-col>
     </van-row>
 

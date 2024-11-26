@@ -40,6 +40,10 @@ export function isCollect(videoId?: any) {
   return request({ url: `/collect/isCollect/${videoId}`, method: 'get' })
 }
 
+export function getTags(videoId?: any) {
+  return request({ url: `/tag/getTags/${videoId}`, method: 'get' })
+}
+
 export function uploadFile(params?: any, data?: any) {
   // 注意这里的内容类型
   return request({
