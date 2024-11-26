@@ -1,5 +1,12 @@
 import { onUnmounted } from 'vue'
 
+// 消息
+interface WSMessage {
+  type: string
+  msgType?: string
+  msg?: string
+}
+
 // 设置
 interface SocketOptions {
   // 心跳间隔
@@ -56,7 +63,8 @@ class Socket {
   // 收到的WebSocket消息
   onMessage(event: MessageEvent) {
     // console.log('WebSocket message received:', event.data);
-    this.emit('message', event.data)
+    const message: WSMessage = JSON.parse(event.data)
+    this.emit('message', message)
   }
 
   // 错误
@@ -86,7 +94,12 @@ class Socket {
 
     this.heartbeatInterval = window.setInterval(() => {
       if (this.ws?.readyState === WebSocket.OPEN) {
-        this.ws.send('PING')
+        const heartbeatMessage: WSMessage = {
+          type: 'HEART',
+          msgType: 'default',
+          msg: 'ping',
+        }
+        this.ws.send(JSON.stringify(heartbeatMessage))
       }
     }, this.opts.heartbeatInterval)
   }
@@ -100,12 +113,12 @@ class Socket {
   }
 
   // 发送消息
-  send(data: any) {
+  send(message: WSMessage) {
     if (this.ws?.readyState === WebSocket.OPEN) {
-      this.ws.send(JSON.stringify(data))
+      this.ws.send(JSON.stringify(message))
     }
     else {
-      console.error('WebSocket is not open. Cannot send:', data)
+      console.error('WebSocket is not open. Cannot send:', message)
     }
   }
 

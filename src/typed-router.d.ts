@@ -26,6 +26,7 @@ declare module 'vue-router/auto-routes' {
     'KeepAlive': RouteRecordInfo<'KeepAlive', '/home/keepalive', Record<never, never>, Record<never, never>>,
     'menu': RouteRecordInfo<'menu', '/home/menu', Record<never, never>, Record<never, never>>,
     'mock': RouteRecordInfo<'mock', '/home/mock', Record<never, never>, Record<never, never>>,
+    'online': RouteRecordInfo<'online', '/home/online', Record<never, never>, Record<never, never>>,
     'unocss': RouteRecordInfo<'unocss', '/home/unocss', Record<never, never>, Record<never, never>>,
     'video': RouteRecordInfo<'video', '/home/video', Record<never, never>, Record<never, never>>,
     'videoInfo': RouteRecordInfo<'videoInfo', '/home/video/info', Record<never, never>, Record<never, never>>,

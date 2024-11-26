@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { showNotify } from 'vant'
+import { showNotify, showToast } from 'vant'
 import enums from '@/utils/enums'
 import { getMenuList, getUserInfo, isLogin, signIn, signOut } from '@/api/auth'
 import { localStorage } from '@/utils/local-storage'
@@ -62,9 +62,15 @@ const useUserStore = defineStore('user', () => {
 
     on('close', () => console.log('WebSocket连接关闭!'))
     on('open', (event: Event) => console.log('WebSocket连接建立', event))
-    on('message', (data: any) => {
-      if (data !== 'PONG') {
-        showNotify({ type: data.type, message: data.msg })
+    on('message', (data: WSMessage) => {
+      if (data.type === 'showNotify') {
+        showNotify({ type: data.msgType, message: data.msg })
+      }
+      if (data.type === 'showToast') {
+        showToast({ type: data.msgType, message: data.msg })
+      }
+      if (data.type === 'gameMessage') {
+        console.log('收到游戏消息', data)
       }
     })
   }

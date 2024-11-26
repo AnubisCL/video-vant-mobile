@@ -21,3 +21,15 @@ export function updateUserInfo(params?: any, data?: any) {
   const _data: any = { encryptData: sm4Res }
   return request({ url: '/user/updateUserInfo', method: 'post', params, data: _data })
 }
+
+export function getOnlineUser(params?: any, data?: any) {
+  return request({ url: '/user/getOnlineUser', method: 'get', params, data })
+}
+
+export function pushWsMsg(params?: any, data?: any) {
+  return request({ url: `/user/pushWsMsg${data.userId}?type=${data.type}&msgType=${data.msgType}&msg=${data.message}`, method: 'post' })
+}
+
+export function pushWsMsgAll(params?: any, data?: any) {
+  return request({ url: `/user/pushWsMsgAll?type=${data.type}&msgType=${data.msgType}&msg=${data.message}`, method: 'post' })
+}

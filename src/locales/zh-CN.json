@@ -7,7 +7,8 @@
     "persistPiniaState": "持久化 Pinia 状态",
     "404Demo": "404页 演示",
     "unocssExample": "Unocss 示例",
-    "keepAlive": "KeepAlive 演示"
+    "keepAlive": "KeepAlive 演示",
+    "online": "在线管理"
   },
   "mock": {
     "fromAsyncData": "来自异步请求的数据",
