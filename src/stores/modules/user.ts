@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { showNotify, showToast } from 'vant'
+import { showConfirmDialog, showDialog, showFailToast, showNotify, showSuccessToast, showToast } from 'vant'
 import enums from '@/utils/enums'
 import { getMenuList, getUserInfo, isLogin, signIn, signOut } from '@/api/auth'
 import { localStorage } from '@/utils/local-storage'
@@ -67,10 +67,46 @@ const useUserStore = defineStore('user', () => {
         showNotify({ type: data.msgType, message: data.msg })
       }
       if (data.type === 'showToast') {
-        showToast({ type: data.msgType, message: data.msg })
+        if (data.msgType === 'success') { // 成功
+          showSuccessToast(data.msg)
+        }
+        if (data.msgType === 'danger') { // 失败
+          showFailToast(data.msg)
+        }
+        if (data.msgType === 'default') { // 自定义图标
+          showToast({
+            message: data.msg,
+            icon: 'like-o',
+          })
+        }
+      }
+      if (data.type === 'showDialog') {
+        if (data.msgType === 'default') { // 默认
+          showDialog({ message: data.msg }).then(() => {
+            // on close
+          })
+        }
+        if (data.msgType === 'primary') { // 标题
+          showDialog({ title: '标题', message: data.msg }).then(() => {
+            // on close
+          })
+        }
+        if (data.msgType === 'success') { // 消息确认
+          showConfirmDialog({
+            title: '标题',
+            message: data.msg,
+            theme: 'round-button', // 圆角按钮
+          })
+            .then(() => {
+              // on confirm
+            })
+            .catch(() => {
+              // on cancel
+            })
+        }
       }
       if (data.type === 'gameMessage') {
-        console.log('收到游戏消息', data)
+        console.log('收到游戏消息', JSON.stringify(data))
       }
     })
   }
