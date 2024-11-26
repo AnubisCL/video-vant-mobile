@@ -27,7 +27,7 @@ export function getOnlineUser(params?: any, data?: any) {
 }
 
 export function pushWsMsg(params?: any, data?: any) {
-  return request({ url: `/user/pushWsMsg${data.userId}?type=${data.type}&msgType=${data.msgType}&msg=${data.message}`, method: 'post' })
+  return request({ url: `/user/pushWsMsg/${data.userId}?type=${data.type}&msgType=${data.msgType}&msg=${data.message}`, method: 'post' })
 }
 
 export function pushWsMsgAll(params?: any, data?: any) {
