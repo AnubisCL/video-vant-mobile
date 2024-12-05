@@ -13,7 +13,7 @@ export async function startCheckLoginTimer() {
           type: 'danger',
           message: translateMessage('business.isLoginOut'),
         })
-        router.replace('/login')
+        router.replace('/')
       }
     }
     else {
@@ -21,7 +21,7 @@ export async function startCheckLoginTimer() {
         type: 'danger',
         message: translateMessage('business.isLoginErr'),
       })
-      router.replace('/login')
+      router.replace('/')
     }
   }, 30000)
 }
