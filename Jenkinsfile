@@ -4,7 +4,7 @@ pipeline {
         GIT_URL = 'https://gitee.com/anubiscl/video-vant-mobile.git' // GitHub 仓库 URL https://github.com/AnubisCL/video-vant-mobile.git
         BRANCH = 'main' // 替换为你想要构建的分支
         DIST_TAR = 'dist.tar' // 构建后的 dist 目录打包成的 tar 文件名
-        DEPLOY_DIR = '/home/webui' // 替换为你要部署文件的目标目录
+        DEPLOY_DIR = '/mnt/f/webui' // 替换为你要部署文件的目标目录
     }
     tools {
         // Install the Maven version configured as "M3" and add it to the path.
