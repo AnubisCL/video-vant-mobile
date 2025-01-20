@@ -54,7 +54,8 @@ const useUserStore = defineStore('user', () => {
    * 初始化 WebSocket 连接
    */
   const initializeWebSocket = async (userId: number) => {
-    const { socket, send, on, off } = useSocket(`ws://${location.host}/ws/${userId}`)
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
+    const { socket, send, on, off } = useSocket(`${protocol}//${location.host}/ws/${userId}`)
     ws.socket = socket
     ws.send = send
     ws.on = on
