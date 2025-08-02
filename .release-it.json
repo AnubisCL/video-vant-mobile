@@ -1,4 +1,14 @@
 {
+  "npm": {
+    "publish": false
+  },
+  "git": {
+    "push": true,
+    "tag": true
+  },
+  "github": {
+    "release": false
+  },
   "hooks": {
     "after:bump": "git cliff --bump -o --tag=v${version}"
   },
@@ -7,7 +17,7 @@
       "out": [
         {
           "file": "package.json",
-          "path": "project > properties > revision",
+          "path": "version",
           "type": "application/json"
         }
       ]
