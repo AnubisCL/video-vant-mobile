@@ -4,7 +4,8 @@
   },
   "git": {
     "push": true,
-    "tag": true
+    "tag": true,
+    "commitArgs": ["--no-verify"]
   },
   "github": {
     "release": false
