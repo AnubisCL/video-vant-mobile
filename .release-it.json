@@ -11,16 +11,5 @@
   },
   "hooks": {
     "after:bump": "git cliff --bump -o --tag=v${version}"
-  },
-  "plugins": {
-    "@release-it/bumper": {
-      "out": [
-        {
-          "file": "package.json",
-          "path": "version",
-          "type": "application/json"
-        }
-      ]
-    }
   }
 }
