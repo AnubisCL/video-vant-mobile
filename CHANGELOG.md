@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.2] - 2025-08-02
+
+### ⚙️ Miscellaneous Tasks
+
+- *(release)* 调整代码提交和验证流程
+
+## [0.1.1] - 2025-08-02
+
+### 💼 Other
+
+- *(release)* 更新 release-it配置
+- 更新项目版本号
+
+### ⚙️ Miscellaneous Tasks
+
+- 添加 release-it 配置和 CHANGELOG.md 文件
+- Release v0.1.1
+
 ## [0.1.0] - 2025-01-20
 
 ### 🚀 Features
